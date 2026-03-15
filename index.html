@@ -896,10 +896,16 @@ async function loadData() {
       document.getElementById('configBanner').style.display = 'flex';
     }
 
-    // Enrich with computed status
+    // Enrich with computed status + normalise locations
+    const locationMap = {
+      'SYD': 'Vicom Syd', 'MEL': 'Vicom Melb', 'NZ': 'Vicom NZ',
+      'Sydney Office': 'Vicom Syd', 'Melbourne': 'Vicom Melb',
+      'AKL': 'Vicom NZ', 'QLD': 'Vicom Syd',
+    };
     equipmentData.forEach(item => {
       item._status = getStatus(item);
       item._daysLeft = getDaysLeft(item['Loan End']);
+      if (locationMap[item['Location']]) item['Location'] = locationMap[item['Location']];
     });
 
     updateStats();
