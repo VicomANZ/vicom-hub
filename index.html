@@ -220,31 +220,44 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);color:v
 <div class="toast-container" id="toastContainer"></div>
 
 <script>
-const GH_REPO='VicomANZ/vicom-hub';
-const GH_TOKEN=localStorage.getItem('vicom_gh_token')||'';
-const DATA_PATH='data/equipment.json';
+const SHEET_CSV_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vS_TlBXj2kDHIxm6PcbnBKFR4_n1vVtd-_J_-qm4ZUWECAM4DeiHI1FJGWKaJydFYGBSUvI7c6fnmoi/pub?gid=12044300&single=true&output=csv';
+const APPS_SCRIPT_URL='https://script.google.com/macros/s/AKfycbxmmke6TU-lpAi1Ryncm6K9faTTlcWTp-d-Sb4rK72D-lt4MQJAE9kiHToUhJeCu14/exec';
 const SALESPEOPLE=['Angus Wu','Matthew Chantler','Pia Yanes','Filip','Hayden Schippers','Andrew Norrie'];
 const FIELDS=['Kit ID','Model','Partner','Serial Number','VAN ID','Category','Location','Status','Owner (Sales Rep)','Signed Out By','Currently With','Customer Loaned To','Loan Start','Loan End','Accessories','Comments'];
+const LOCATION_MAP={'SYD':'Vicom Syd','MEL':'Vicom Melb','NZ':'Vicom NZ','Sydney Office':'Vicom Syd','Melbourne':'Vicom Melb','AKL':'Vicom NZ','QLD':'Vicom Syd'};
+const PARTNER_MAP={'MSO':'Tektronix','MDO':'Tektronix','TBS':'Tektronix','PWRKIT':'Tektronix','RSA':'Tektronix','KEI':'Keithley','Keithley':'Keithley'};
 
 let equipmentData=[];
 let activeItem=null;
-let fileSha=null;
 
-// GitHub API
-async function ghFetch(path,opts={}){
-  const r=await fetch(`https://api.github.com/repos/${GH_REPO}/contents/${path}`,{...opts,headers:{'Authorization':`Bearer ${GH_TOKEN}`,'Content-Type':'application/json',...(opts.headers||{})}});
-  return r.json();
+// CSV Parser
+function parseCSV(csv){
+  const lines=csv.replace(/\r/g,'').trim().split('\n');
+  const headers=lines[0].split(',').map(h=>h.trim().replace(/^"|"$/g,''));
+  return lines.slice(1).filter(l=>l.trim()).map(line=>{
+    const vals=[];let cur='',inQ=false;
+    for(let i=0;i<line.length;i++){if(line[i]==='"')inQ=!inQ;else if(line[i]===','&&!inQ){vals.push(cur.trim());cur='';}else cur+=line[i];}
+    vals.push(cur.trim());
+    const obj={};headers.forEach((h,i)=>obj[h]=vals[i]||'');return obj;
+  });
 }
+
+// Data loading from Google Sheet
 async function loadData(){
   document.getElementById('btnRefresh').classList.add('loading');
   try{
-    const d=await ghFetch(DATA_PATH);
-    fileSha=d.sha;
-    const json=JSON.parse(atob(d.content));
-    equipmentData=(json.equipment||[]).map(item=>{
+    const res=await fetch(SHEET_CSV_URL+'&t='+Date.now());
+    const csv=await res.text();
+    equipmentData=parseCSV(csv);
+    // Enrich: normalise locations, auto-detect partner, compute status
+    equipmentData.forEach(item=>{
+      if(LOCATION_MAP[item.Location])item.Location=LOCATION_MAP[item.Location];
+      if(!item.Partner){
+        const kid=item['Kit ID']||'';const model=item.Model||'';
+        for(const[k,v]of Object.entries(PARTNER_MAP)){if(kid.includes(k)||model.includes(k)){item.Partner=v;break;}}
+      }
       item._status=getStatus(item);
       item._daysLeft=getDaysLeft(item['Loan End']);
-      return item;
     });
     updateStats();populateFilters();renderGrid();renderTable();
     document.getElementById('lastSync').textContent='Synced '+new Date().toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'});
@@ -252,16 +265,12 @@ async function loadData(){
   }catch(e){console.error(e);showToast('Failed to load','error');}
   document.getElementById('btnRefresh').classList.remove('loading');
 }
-async function saveToGitHub(msg){
-  const bar=document.getElementById('savingBar');bar.classList.add('active');
-  try{
-    const payload={lastUpdated:new Date().toISOString(),equipment:equipmentData.map(i=>{const c={};FIELDS.forEach(f=>c[f]=i[f]||'');return c;})};
-    const content=btoa(unescape(encodeURIComponent(JSON.stringify(payload,null,2))));
-    const r=await ghFetch(DATA_PATH,{method:'PUT',body:JSON.stringify({message:msg,content,sha:fileSha})});
-    if(r.content){fileSha=r.content.sha;showToast('Saved successfully');}
-    else{console.error(r);showToast('Save may have failed','error');}
-  }catch(e){console.error(e);showToast('Save failed','error');}
-  bar.classList.remove('active');
+
+// Write-back via Apps Script
+async function postToSheet(payload){
+  if(!APPS_SCRIPT_URL)return false;
+  try{await fetch(APPS_SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify(payload)});return true;}
+  catch(e){console.error(e);return false;}
 }
 
 // Helpers
@@ -375,7 +384,7 @@ async function saveChanges(){
   activeItem['Owner (Sales Rep)']=document.getElementById('panelSalesperson').value;
   activeItem['Loan End']=document.getElementById('panelLoanEnd').value;
   activeItem._status=getStatus(activeItem);activeItem._daysLeft=getDaysLeft(activeItem['Loan End']);
-  await saveToGitHub(`update: ${activeItem['Kit ID']}`);
+  await postToSheet({action:'update',kitId:activeItem['Kit ID'],fields:{'Owner (Sales Rep)':activeItem['Owner (Sales Rep)'],'Loan End':activeItem['Loan End']}});
   updateStats();renderGrid();renderTable();closePanel();
 }
 async function markReturned(){
@@ -383,7 +392,7 @@ async function markReturned(){
   activeItem.Status='Available';activeItem['Currently With']=activeItem['Owner (Sales Rep)'];
   activeItem['Customer Loaned To']='';activeItem['Loan Start']='';activeItem['Loan End']='';activeItem['Signed Out By']='';
   activeItem._status='Available';activeItem._daysLeft=null;
-  await saveToGitHub(`return: ${activeItem['Kit ID']}`);
+  await postToSheet({action:'return',kitId:activeItem['Kit ID']});
   updateStats();renderGrid();renderTable();closePanel();
 }
 async function addEquipment(){
@@ -395,7 +404,8 @@ async function addEquipment(){
   Object.assign(n,{'Kit ID':kid,Model:model,Partner:partner,'Serial Number':v('addSerial'),'VAN ID':v('addVanId'),Category:cat,Location:loc,Status:'Available','Owner (Sales Rep)':owner,'Currently With':owner,Accessories:v('addAccessories'),Comments:v('addComments')});
   n._status='Available';n._daysLeft=null;
   equipmentData.push(n);
-  await saveToGitHub(`add: ${kid} — ${model} (${partner})`);
+  await postToSheet({action:'newLoan',kitId:kid,model,customerName:owner,customerCompany:'',salesperson:owner,loanStart:'',loanEnd:'',purpose:'New equipment added via dashboard'});
+  showToast('Equipment added — refresh in a moment to see it in Sheet');
   clearAddForm();populateFilters();updateStats();renderGrid();renderTable();
 }
 function clearAddForm(){['addKitId','addModel','addSerial','addVanId','addAccessories','addComments'].forEach(id=>document.getElementById(id).value='');['addPartner','addCategory','addLocation','addOwner'].forEach(id=>document.getElementById(id).selectedIndex=0);}
@@ -414,8 +424,6 @@ function showToast(msg,type='success'){
   setTimeout(()=>{t.style.opacity='0';t.style.transform='translateY(10px)';t.style.transition='all .3s';setTimeout(()=>t.remove(),300);},3000);
 }
 
-// Token setup
-if(!GH_TOKEN){const t=prompt("Enter GitHub PAT to enable read/write:");if(t){localStorage.setItem("vicom_gh_token",t);location.reload();}}
 // Init
 loadData();
 setInterval(loadData,5*60*1000);
