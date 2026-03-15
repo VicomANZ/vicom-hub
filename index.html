@@ -7,815 +7,208 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root {
-  --navy: #295790;
-  --navy-dark: #1d3f6a;
-  --navy-deeper: #152d4d;
-  --gold: #D4A017;
-  --gold-light: #e8bf4a;
-  --green: #22c55e;
-  --green-bg: #f0fdf4;
-  --green-border: #bbf7d0;
-  --red: #ef4444;
-  --red-bg: #fef2f2;
-  --red-border: #fecaca;
-  --orange: #f59e0b;
-  --orange-bg: #fffbeb;
-  --orange-border: #fde68a;
-  --bg: #f8f9fc;
-  --card-bg: #ffffff;
-  --text: #1e293b;
-  --text-secondary: #64748b;
-  --text-muted: #94a3b8;
-  --border: #e2e8f0;
-  --border-light: #f1f5f9;
-  --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
-  --shadow-md: 0 4px 12px rgba(0,0,0,0.06);
-  --shadow-lg: 0 8px 30px rgba(0,0,0,0.1);
-  --radius: 10px;
-  --radius-sm: 6px;
-}
-
-* { margin: 0; padding: 0; box-sizing: border-box; }
-
-body {
-  font-family: 'DM Sans', -apple-system, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  line-height: 1.5;
-  min-height: 100vh;
-}
-
-/* HEADER */
-.header {
-  background: linear-gradient(135deg, var(--navy) 0%, var(--navy-dark) 100%);
-  padding: 0 32px;
-  height: 64px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-
-.header-left {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.header-logo {
-  font-size: 20px;
-  font-weight: 700;
-  color: #fff;
-  letter-spacing: -0.3px;
-}
-
-.header-logo span {
-  color: var(--gold);
-  font-weight: 400;
-}
-
-.header-divider {
-  width: 1px;
-  height: 28px;
-  background: rgba(255,255,255,0.2);
-}
-
-.header-right {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.last-sync {
-  font-size: 12px;
-  color: rgba(255,255,255,0.6);
-  font-family: 'JetBrains Mono', monospace;
-}
-
-.btn-refresh {
-  background: rgba(255,255,255,0.1);
-  border: 1px solid rgba(255,255,255,0.15);
-  color: #fff;
-  padding: 6px 14px;
-  border-radius: var(--radius-sm);
-  font-size: 13px;
-  font-family: 'DM Sans', sans-serif;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.btn-refresh:hover { background: rgba(255,255,255,0.2); }
-.btn-refresh.loading svg { animation: spin 1s linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
-
-/* TABS */
-.tabs-bar {
-  background: var(--card-bg);
-  border-bottom: 1px solid var(--border);
-  padding: 0 32px;
-  display: flex;
-  gap: 0;
-}
-
-.tab-btn {
-  padding: 14px 24px;
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--text-secondary);
-  background: none;
-  border: none;
-  border-bottom: 2px solid transparent;
-  cursor: pointer;
-  transition: all 0.2s;
-  font-family: 'DM Sans', sans-serif;
-}
-
-.tab-btn:hover { color: var(--navy); }
-.tab-btn.active {
-  color: var(--navy);
-  border-bottom-color: var(--gold);
-  font-weight: 600;
-}
-
-/* MAIN CONTENT */
-.main {
-  padding: 28px 32px;
-  max-width: 1400px;
-  margin: 0 auto;
-}
-
-/* STATS BAR */
-.stats-bar {
-  display: flex;
-  gap: 16px;
-  margin-bottom: 24px;
-}
-
-.stat-card {
-  flex: 1;
-  background: var(--card-bg);
-  border-radius: var(--radius);
-  padding: 18px 22px;
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-sm);
-}
-
-.stat-label {
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 4px;
-}
-
-.stat-value {
-  font-size: 28px;
-  font-weight: 700;
-  color: var(--text);
-  letter-spacing: -0.5px;
-}
-
-.stat-value.green { color: var(--green); }
-.stat-value.red { color: var(--red); }
-.stat-value.orange { color: var(--orange); }
-
-/* FILTER BAR */
-.filter-bar {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 24px;
-  flex-wrap: wrap;
-  align-items: center;
-}
-
-.filter-bar select, .filter-bar input {
-  padding: 8px 14px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  font-size: 13px;
-  font-family: 'DM Sans', sans-serif;
-  color: var(--text);
-  background: var(--card-bg);
-  outline: none;
-  transition: border-color 0.2s;
-}
-
-.filter-bar select:focus, .filter-bar input:focus {
-  border-color: var(--navy);
-}
-
-.filter-bar input[type="text"] {
-  min-width: 220px;
-}
-
-/* EQUIPMENT GRID */
-.equipment-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 16px;
-}
-
-.equip-card {
-  background: var(--card-bg);
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-sm);
-  padding: 20px;
-  cursor: pointer;
-  transition: all 0.2s;
-  position: relative;
-  overflow: hidden;
-}
-
-.equip-card:hover {
-  box-shadow: var(--shadow-md);
-  transform: translateY(-1px);
-  border-color: var(--navy);
-}
-
-.equip-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-}
-
-.equip-card.available::before { background: var(--green); }
-.equip-card.on-loan::before { background: var(--red); }
-.equip-card.overdue::before { background: var(--orange); }
-
-.equip-card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 12px;
-}
-
-.equip-name {
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--text);
-  line-height: 1.3;
-}
-
-.equip-id {
-  font-size: 11px;
-  font-family: 'JetBrains Mono', monospace;
-  color: var(--text-muted);
-  margin-top: 2px;
-}
-
-.status-badge {
-  padding: 4px 10px;
-  border-radius: 20px;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.3px;
-  white-space: nowrap;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-
-.status-badge .dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-.status-badge.available {
-  background: var(--green-bg);
-  color: #16a34a;
-  border: 1px solid var(--green-border);
-}
-.status-badge.available .dot { background: var(--green); }
-
-.status-badge.on-loan {
-  background: var(--red-bg);
-  color: #dc2626;
-  border: 1px solid var(--red-border);
-}
-.status-badge.on-loan .dot { background: var(--red); }
-
-.status-badge.overdue {
-  background: var(--orange-bg);
-  color: #d97706;
-  border: 1px solid var(--orange-border);
-}
-.status-badge.overdue .dot {
-  background: var(--orange);
-  animation: pulse-dot 1.5s ease-in-out infinite;
-}
-
-@keyframes pulse-dot {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
-}
-
-.equip-category {
-  font-size: 12px;
-  color: var(--text-secondary);
-  margin-bottom: 10px;
-}
-
-.equip-meta {
-  font-size: 12px;
-  color: var(--text-muted);
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-.equip-meta strong {
-  color: var(--text-secondary);
-  font-weight: 500;
-}
-
-/* DETAIL PANEL (slide-over) */
-.overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.3);
-  z-index: 200;
-  animation: fadeIn 0.2s;
-}
-
-.overlay.open { display: block; }
-
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-.detail-panel {
-  position: fixed;
-  top: 0;
-  right: -520px;
-  width: 500px;
-  max-width: 90vw;
-  height: 100vh;
-  background: var(--card-bg);
-  z-index: 201;
-  box-shadow: -8px 0 30px rgba(0,0,0,0.15);
-  transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  overflow-y: auto;
-}
-
-.detail-panel.open { right: 0; }
-
-.panel-header {
-  padding: 24px;
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  position: sticky;
-  top: 0;
-  background: var(--card-bg);
-  z-index: 1;
-}
-
-.panel-close {
-  background: none;
-  border: none;
-  font-size: 24px;
-  color: var(--text-muted);
-  cursor: pointer;
-  padding: 4px;
-  line-height: 1;
-}
-.panel-close:hover { color: var(--text); }
-
-.panel-body { padding: 24px; }
-
-.panel-section {
-  margin-bottom: 24px;
-}
-
-.panel-section-title {
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
-  color: var(--text-muted);
-  margin-bottom: 12px;
-}
-
-.panel-field {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 0;
-  border-bottom: 1px solid var(--border-light);
-}
-
-.panel-field:last-child { border-bottom: none; }
-
-.panel-field-label {
-  font-size: 13px;
-  color: var(--text-secondary);
-}
-
-.panel-field-value {
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text);
-  text-align: right;
-}
-
-.panel-field-value.overdue {
-  color: var(--orange);
-  font-weight: 600;
-}
-
-/* Panel form elements */
-.panel-select, .panel-input, .panel-date {
-  padding: 8px 12px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  font-size: 13px;
-  font-family: 'DM Sans', sans-serif;
-  color: var(--text);
-  background: var(--card-bg);
-  outline: none;
-  width: 100%;
-}
-
-.panel-select:focus, .panel-input:focus, .panel-date:focus {
-  border-color: var(--navy);
-}
-
-.panel-actions {
-  display: flex;
-  gap: 10px;
-  margin-top: 8px;
-}
-
-.btn {
-  padding: 10px 20px;
-  border-radius: var(--radius-sm);
-  font-size: 13px;
-  font-weight: 600;
-  font-family: 'DM Sans', sans-serif;
-  cursor: pointer;
-  border: none;
-  transition: all 0.2s;
-  flex: 1;
-  text-align: center;
-}
-
-.btn-primary {
-  background: var(--navy);
-  color: #fff;
-}
-.btn-primary:hover { background: var(--navy-dark); }
-
-.btn-success {
-  background: var(--green);
-  color: #fff;
-}
-.btn-success:hover { background: #16a34a; }
-
-.btn-danger {
-  background: var(--red);
-  color: #fff;
-}
-
-.btn-outline {
-  background: transparent;
-  color: var(--text-secondary);
-  border: 1px solid var(--border);
-}
-.btn-outline:hover { background: var(--bg); }
-
-/* EMPTY STATE */
-.empty-state {
-  text-align: center;
-  padding: 80px 20px;
-  color: var(--text-muted);
-}
-
-.empty-state svg {
-  margin-bottom: 16px;
-  opacity: 0.4;
-}
-
-.empty-state h3 {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--text-secondary);
-  margin-bottom: 6px;
-}
-
-.empty-state p {
-  font-size: 13px;
-}
-
-/* CONFIG BANNER */
-.config-banner {
-  background: var(--orange-bg);
-  border: 1px solid var(--orange-border);
-  border-radius: var(--radius);
-  padding: 16px 22px;
-  margin-bottom: 24px;
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-}
-
-.config-banner svg { flex-shrink: 0; margin-top: 1px; }
-
-.config-banner-text h4 {
-  font-size: 14px;
-  font-weight: 600;
-  color: #92400e;
-  margin-bottom: 4px;
-}
-
-.config-banner-text p {
-  font-size: 13px;
-  color: #a16207;
-  line-height: 1.5;
-}
-
-.config-banner-text code {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 12px;
-  background: rgba(0,0,0,0.06);
-  padding: 2px 6px;
-  border-radius: 3px;
-}
-
-/* TOAST */
-.toast-container {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  z-index: 300;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.toast {
-  background: var(--navy-deeper);
-  color: #fff;
-  padding: 12px 20px;
-  border-radius: var(--radius-sm);
-  font-size: 13px;
-  box-shadow: var(--shadow-lg);
-  animation: slideUp 0.3s;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-@keyframes slideUp {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* LOADING */
-.loading-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 16px;
-}
-
-.skeleton-card {
-  background: var(--card-bg);
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
-  padding: 20px;
-  height: 140px;
-}
-
-.skeleton-line {
-  height: 12px;
-  background: linear-gradient(90deg, var(--border-light) 25%, var(--border) 50%, var(--border-light) 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
-  border-radius: 4px;
-  margin-bottom: 10px;
-}
-
-.skeleton-line:first-child { width: 70%; height: 16px; }
-.skeleton-line:nth-child(2) { width: 40%; }
-.skeleton-line:nth-child(3) { width: 55%; margin-top: 20px; }
-
-@keyframes shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
-
-/* RESPONSIVE */
-@media (max-width: 768px) {
-  .header { padding: 0 16px; }
-  .tabs-bar { padding: 0 16px; overflow-x: auto; }
-  .main { padding: 20px 16px; }
-  .stats-bar { flex-direction: column; gap: 10px; }
-  .equipment-grid { grid-template-columns: 1fr; }
-  .detail-panel { width: 100vw; }
-}
+:root{--navy:#295790;--navy-dark:#1d3f6a;--navy-deeper:#152d4d;--gold:#D4A017;--green:#22c55e;--green-bg:#f0fdf4;--green-border:#bbf7d0;--red:#ef4444;--red-bg:#fef2f2;--red-border:#fecaca;--orange:#f59e0b;--orange-bg:#fffbeb;--orange-border:#fde68a;--bg:#f8f9fc;--card-bg:#fff;--text:#1e293b;--text-secondary:#64748b;--text-muted:#94a3b8;--border:#e2e8f0;--border-light:#f1f5f9;--shadow-sm:0 1px 2px rgba(0,0,0,.04);--shadow-md:0 4px 12px rgba(0,0,0,.06);--shadow-lg:0 8px 30px rgba(0,0,0,.1);--radius:10px;--radius-sm:6px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.5;min-height:100vh}
+.header{background:linear-gradient(135deg,var(--navy),var(--navy-dark));padding:0 32px;height:64px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 8px rgba(0,0,0,.15);position:sticky;top:0;z-index:100}
+.header-left{display:flex;align-items:center;gap:16px}
+.header-logo{font-size:20px;font-weight:700;color:#fff;letter-spacing:-.3px}
+.header-logo span{color:var(--gold);font-weight:400}
+.header-right{display:flex;align-items:center;gap:12px}
+.last-sync{font-size:12px;color:rgba(255,255,255,.6);font-family:'JetBrains Mono',monospace}
+.btn-refresh{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);color:#fff;padding:6px 14px;border-radius:var(--radius-sm);font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px}
+.btn-refresh:hover{background:rgba(255,255,255,.2)}
+.btn-refresh.loading svg{animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.tabs-bar{background:var(--card-bg);border-bottom:1px solid var(--border);padding:0 32px;display:flex;gap:0}
+.tab-btn{padding:14px 24px;font-size:14px;font-weight:500;color:var(--text-secondary);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif}
+.tab-btn:hover{color:var(--navy)}
+.tab-btn.active{color:var(--navy);border-bottom-color:var(--gold);font-weight:600}
+.main{padding:28px 32px;max-width:1400px;margin:0 auto}
+.tab-content{display:none}.tab-content.active{display:block}
+.stats-bar{display:flex;gap:16px;margin-bottom:24px}
+.stat-card{flex:1;background:var(--card-bg);border-radius:var(--radius);padding:18px 22px;border:1px solid var(--border);box-shadow:var(--shadow-sm)}
+.stat-label{font-size:12px;font-weight:500;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.stat-value{font-size:28px;font-weight:700;letter-spacing:-.5px}
+.stat-value.green{color:var(--green)}.stat-value.red{color:var(--red)}.stat-value.orange{color:var(--orange)}
+.filter-bar{display:flex;gap:10px;margin-bottom:24px;flex-wrap:wrap;align-items:center}
+.filter-bar select,.filter-bar input{padding:8px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:'DM Sans',sans-serif;color:var(--text);background:var(--card-bg);outline:none}
+.filter-bar input[type="text"]{min-width:220px}
+.equipment-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.equip-card{background:var(--card-bg);border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow-sm);padding:20px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.equip-card:hover{box-shadow:var(--shadow-md);transform:translateY(-1px);border-color:var(--navy)}
+.equip-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.equip-card.available::before{background:var(--green)}
+.equip-card.on-loan::before{background:var(--red)}
+.equip-card.overdue::before{background:var(--orange)}
+.equip-card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
+.equip-name{font-size:15px;font-weight:600;line-height:1.3}
+.equip-id{font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--text-muted);margin-top:2px}
+.status-badge{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:.3px;white-space:nowrap;display:flex;align-items:center;gap:5px}
+.status-badge .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.status-badge.available{background:var(--green-bg);color:#16a34a;border:1px solid var(--green-border)}.status-badge.available .dot{background:var(--green)}
+.status-badge.on-loan{background:var(--red-bg);color:#dc2626;border:1px solid var(--red-border)}.status-badge.on-loan .dot{background:var(--red)}
+.status-badge.overdue{background:var(--orange-bg);color:#d97706;border:1px solid var(--orange-border)}.status-badge.overdue .dot{background:var(--orange);animation:pulse-dot 1.5s ease-in-out infinite}
+@keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:.4}}
+.equip-category{font-size:12px;color:var(--text-secondary);margin-bottom:10px}
+.equip-meta{font-size:12px;color:var(--text-muted);display:flex;flex-direction:column;gap:3px}
+.equip-meta strong{color:var(--text-secondary);font-weight:500}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:200}
+.overlay.open{display:block}
+.detail-panel{position:fixed;top:0;right:-520px;width:500px;max-width:90vw;height:100vh;background:var(--card-bg);z-index:201;box-shadow:-8px 0 30px rgba(0,0,0,.15);transition:right .3s cubic-bezier(.4,0,.2,1);overflow-y:auto}
+.detail-panel.open{right:0}
+.panel-header{padding:24px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start;position:sticky;top:0;background:var(--card-bg);z-index:1}
+.panel-close{background:none;border:none;font-size:24px;color:var(--text-muted);cursor:pointer;padding:4px;line-height:1}
+.panel-close:hover{color:var(--text)}
+.panel-body{padding:24px}
+.panel-section{margin-bottom:24px}
+.panel-section-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--text-muted);margin-bottom:12px}
+.panel-field{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border-light)}
+.panel-field:last-child{border-bottom:none}
+.panel-field-label{font-size:13px;color:var(--text-secondary)}
+.panel-field-value{font-size:13px;font-weight:500;color:var(--text);text-align:right}
+.panel-field-value.overdue{color:var(--orange);font-weight:600}
+.panel-select,.panel-date{padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:'DM Sans',sans-serif;color:var(--text);background:var(--card-bg);outline:none;width:100%}
+.panel-actions{display:flex;gap:10px;margin-top:8px}
+.btn{padding:10px 20px;border-radius:var(--radius-sm);font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;border:none;transition:all .2s;flex:1;text-align:center}
+.btn-primary{background:var(--navy);color:#fff}.btn-primary:hover{background:var(--navy-dark)}
+.btn-success{background:var(--green);color:#fff}.btn-success:hover{background:#16a34a}
+.btn-outline{background:transparent;color:var(--text-secondary);border:1px solid var(--border)}.btn-outline:hover{background:var(--bg)}
+.table-wrapper{overflow-x:auto;background:var(--card-bg);border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow-sm)}
+.data-table{width:100%;border-collapse:collapse;font-size:13px}
+.data-table th{background:var(--navy);color:#fff;padding:10px 14px;text-align:left;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;position:sticky;top:0}
+.data-table td{padding:8px 14px;border-bottom:1px solid var(--border-light);white-space:nowrap;max-width:200px;overflow:hidden;text-overflow:ellipsis}
+.data-table tr:hover td{background:#f8fafc}
+.data-table tr.on-loan td{background:var(--red-bg)}
+.data-table tr.overdue td{background:var(--orange-bg)}
+.cell-status{font-weight:600;font-size:11px}
+.cell-status.available{color:var(--green)}.cell-status.on-loan{color:var(--red)}.cell-status.overdue{color:var(--orange)}
+.add-form-container{background:var(--card-bg);border-radius:var(--radius);border:1px solid var(--border);padding:24px;margin-bottom:24px;box-shadow:var(--shadow-sm)}
+.add-form-title{font-size:15px;font-weight:600;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.add-form-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:16px}
+.form-group{display:flex;flex-direction:column;gap:4px}
+.form-group label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted)}
+.form-group input,.form-group select{padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:'DM Sans',sans-serif;color:var(--text);outline:none}
+.form-actions{display:flex;gap:10px}.form-actions .btn{flex:0;padding:10px 28px}
+.saving-bar{display:none;position:fixed;top:64px;left:0;right:0;background:var(--gold);color:var(--navy-deeper);text-align:center;padding:8px;font-size:13px;font-weight:600;z-index:150}
+.saving-bar.active{display:block}
+.toast-container{position:fixed;bottom:24px;right:24px;z-index:300;display:flex;flex-direction:column;gap:8px}
+.toast{background:var(--navy-deeper);color:#fff;padding:12px 20px;border-radius:var(--radius-sm);font-size:13px;box-shadow:var(--shadow-lg);animation:slideUp .3s;display:flex;align-items:center;gap:8px}
+@keyframes slideUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.empty-state{text-align:center;padding:80px 20px;color:var(--text-muted)}
+.empty-state h3{font-size:16px;font-weight:600;color:var(--text-secondary);margin-bottom:6px}
+@media(max-width:768px){.header{padding:0 16px}.tabs-bar{padding:0 16px;overflow-x:auto}.main{padding:20px 16px}.stats-bar{flex-direction:column;gap:10px}.equipment-grid{grid-template-columns:1fr}.detail-panel{width:100vw}.add-form-grid{grid-template-columns:1fr 1fr}}
 </style>
 </head>
 <body>
-
-<!-- HEADER -->
 <header class="header">
   <div class="header-left">
     <div class="header-logo">VICOM <span>Hub</span></div>
-    <div class="header-divider"></div>
-    <span style="color:rgba(255,255,255,0.5); font-size:13px;">Internal Operations</span>
+    <div style="width:1px;height:28px;background:rgba(255,255,255,.2)"></div>
+    <span style="color:rgba(255,255,255,.5);font-size:13px">Demo Equipment</span>
   </div>
   <div class="header-right">
     <span class="last-sync" id="lastSync">—</span>
     <button class="btn-refresh" id="btnRefresh" onclick="loadData()">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
-      Refresh
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg> Refresh
     </button>
   </div>
 </header>
 
-<!-- TABS -->
 <nav class="tabs-bar">
-  <button class="tab-btn active" data-tab="demo">Demo Equipment</button>
-  <button class="tab-btn" data-tab="placeholder1" style="opacity:0.4;cursor:default;">+ Add Tab</button>
+  <button class="tab-btn active" data-tab="cards">Dashboard</button>
+  <button class="tab-btn" data-tab="spreadsheet">Spreadsheet</button>
 </nav>
 
-<!-- MAIN -->
+<div class="saving-bar" id="savingBar">Saving to repository...</div>
+
 <main class="main">
-  <!-- Config banner (shown when no sheet connected) -->
-  <div class="config-banner" id="configBanner" style="display:none;">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-    <div class="config-banner-text">
-      <h4>Google Sheet not connected</h4>
-      <p>To connect your equipment data, publish your Google Sheet to the web (File → Share → Publish to web → CSV), then paste the URL into the <code>SHEET_CSV_URL</code> variable in this page's config. The sheet needs columns: <code>Equipment ID, Name, Category, Serial Number, Status, Borrower Name, Borrower Company, Borrower Email, Borrower Phone, Loan Start, Loan End, Salesperson, Purpose, Notes</code></p>
+  <div class="tab-content active" id="tab-cards">
+    <div class="stats-bar">
+      <div class="stat-card"><div class="stat-label">Total Equipment</div><div class="stat-value" id="statTotal">—</div></div>
+      <div class="stat-card"><div class="stat-label">Available</div><div class="stat-value green" id="statAvailable">—</div></div>
+      <div class="stat-card"><div class="stat-label">On Loan</div><div class="stat-value red" id="statOnLoan">—</div></div>
+      <div class="stat-card"><div class="stat-label">Overdue</div><div class="stat-value orange" id="statOverdue">—</div></div>
     </div>
+    <div class="filter-bar">
+      <input type="text" id="filterSearch" placeholder="Search equipment..." oninput="renderGrid()">
+      <select id="filterStatus" onchange="renderGrid()"><option value="">All Statuses</option><option>Available</option><option>On Loan</option><option>Overdue</option></select>
+      <select id="filterCategory" onchange="renderGrid()"><option value="">All Categories</option></select>
+      <select id="filterPartner" onchange="renderGrid()"><option value="">All Partners</option></select>
+      <select id="filterLocation" onchange="renderGrid()"><option value="">All Locations</option></select>
+    </div>
+    <div id="gridContainer"><div class="empty-state"><p>Loading...</p></div></div>
   </div>
 
-  <!-- Stats -->
-  <div class="stats-bar" id="statsBar">
-    <div class="stat-card">
-      <div class="stat-label">Total Equipment</div>
-      <div class="stat-value" id="statTotal">—</div>
+  <div class="tab-content" id="tab-spreadsheet">
+    <div class="add-form-container">
+      <div class="add-form-title">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+        Add New Equipment
+      </div>
+      <div class="add-form-grid">
+        <div class="form-group"><label>Kit ID *</label><input type="text" id="addKitId" placeholder="e.g. MSO24_QLD"></div>
+        <div class="form-group"><label>Model *</label><input type="text" id="addModel" placeholder="e.g. MSO24"></div>
+        <div class="form-group"><label>Partner *</label><select id="addPartner"><option value="">Select...</option><option>Tektronix</option><option>Keithley</option><option>Rohde & Schwarz</option><option>EXFO</option><option>Spirent</option><option>Bird</option><option>Rigol</option><option>Other</option></select></div>
+        <div class="form-group"><label>Serial Number</label><input type="text" id="addSerial" placeholder="e.g. C070123"></div>
+        <div class="form-group"><label>VAN ID</label><input type="text" id="addVanId" placeholder="e.g. 9001"></div>
+        <div class="form-group"><label>Category *</label><select id="addCategory"><option value="">Select...</option><option>2 Series Oscilloscope</option><option>3 Series Oscilloscope</option><option>4 Series Oscilloscope</option><option>5 Series Oscilloscope</option><option>6 Series Oscilloscope</option><option>TBS Oscilloscope</option><option>Keithley</option><option>RSA/Spectrum Analyzer</option><option>Power Analysis Kit</option><option>Optical Fibre</option><option>GNSS/GPS Simulator</option><option>RF Power</option><option>DC Power Supply</option><option>Other</option></select></div>
+        <div class="form-group"><label>Location *</label><select id="addLocation"><option value="">Select...</option><option>Vicom Syd</option><option>Vicom Melb</option><option>Vicom NZ</option></select></div>
+        <div class="form-group"><label>Owner (Sales Rep) *</label><select id="addOwner"><option value="">Select...</option></select></div>
+        <div class="form-group" style="grid-column:span 2"><label>Accessories</label><input type="text" id="addAccessories" placeholder="e.g. TPP0200 (200MHz Probe); P6315 (Logic Probe)"></div>
+        <div class="form-group" style="grid-column:span 2"><label>Comments</label><input type="text" id="addComments" placeholder="Optional notes"></div>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-primary" onclick="addEquipment()">Add Equipment</button>
+        <button class="btn btn-outline" onclick="clearAddForm()">Clear</button>
+      </div>
     </div>
-    <div class="stat-card">
-      <div class="stat-label">Available</div>
-      <div class="stat-value green" id="statAvailable">—</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">On Loan</div>
-      <div class="stat-value red" id="statOnLoan">—</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Overdue</div>
-      <div class="stat-value orange" id="statOverdue">—</div>
-    </div>
-  </div>
-
-  <!-- Filters -->
-  <div class="filter-bar">
-    <input type="text" id="filterSearch" placeholder="Search equipment..." oninput="renderGrid()">
-    <select id="filterStatus" onchange="renderGrid()">
-      <option value="">All Statuses</option>
-      <option value="Available">Available</option>
-      <option value="On Loan">On Loan</option>
-      <option value="Overdue">Overdue</option>
-    </select>
-    <select id="filterCategory" onchange="renderGrid()">
-      <option value="">All Categories</option>
-    </select>
-    <select id="filterSalesperson" onchange="renderGrid()">
-      <option value="">All Salespeople</option>
-    </select>
-    <select id="filterLocation" onchange="renderGrid()">
-      <option value="">All Locations</option>
-    </select>
-  </div>
-
-  <!-- Equipment Grid -->
-  <div id="gridContainer">
-    <div class="loading-grid">
-      <div class="skeleton-card"><div class="skeleton-line"></div><div class="skeleton-line"></div><div class="skeleton-line"></div></div>
-      <div class="skeleton-card"><div class="skeleton-line"></div><div class="skeleton-line"></div><div class="skeleton-line"></div></div>
-      <div class="skeleton-card"><div class="skeleton-line"></div><div class="skeleton-line"></div><div class="skeleton-line"></div></div>
-      <div class="skeleton-card"><div class="skeleton-line"></div><div class="skeleton-line"></div><div class="skeleton-line"></div></div>
-      <div class="skeleton-card"><div class="skeleton-line"></div><div class="skeleton-line"></div><div class="skeleton-line"></div></div>
-      <div class="skeleton-card"><div class="skeleton-line"></div><div class="skeleton-line"></div><div class="skeleton-line"></div></div>
-    </div>
+    <div class="table-wrapper"><table class="data-table" id="dataTable"><thead><tr></tr></thead><tbody></tbody></table></div>
   </div>
 </main>
 
-<!-- DETAIL PANEL OVERLAY -->
 <div class="overlay" id="overlay" onclick="closePanel()"></div>
-
-<!-- DETAIL PANEL -->
 <div class="detail-panel" id="detailPanel">
   <div class="panel-header">
-    <div>
-      <div id="panelName" style="font-size:18px;font-weight:700;color:var(--text);"></div>
-      <div id="panelId" style="font-size:12px;font-family:'JetBrains Mono',monospace;color:var(--text-muted);margin-top:2px;"></div>
-    </div>
+    <div><div id="panelName" style="font-size:18px;font-weight:700"></div><div id="panelId" style="font-size:12px;font-family:'JetBrains Mono',monospace;color:var(--text-muted);margin-top:2px"></div></div>
     <button class="panel-close" onclick="closePanel()">×</button>
   </div>
   <div class="panel-body">
-    <!-- Status -->
-    <div class="panel-section">
-      <div class="panel-section-title">Status</div>
-      <div id="panelStatusBadge" style="display:inline-block;"></div>
-    </div>
-
-    <!-- Equipment Info (always visible) -->
+    <div class="panel-section"><div class="panel-section-title">Status</div><div id="panelStatusBadge" style="display:inline-block"></div></div>
     <div class="panel-section">
       <div class="panel-section-title">Equipment Details</div>
-      <div class="panel-field">
-        <span class="panel-field-label">Category</span>
-        <span class="panel-field-value" id="panelCategory"></span>
-      </div>
-      <div class="panel-field">
-        <span class="panel-field-label">Serial Number</span>
-        <span class="panel-field-value" id="panelSerial"></span>
-      </div>
-      <div class="panel-field">
-        <span class="panel-field-label">VAN ID</span>
-        <span class="panel-field-value" id="panelVanId"></span>
-      </div>
-      <div class="panel-field">
-        <span class="panel-field-label">Home Location</span>
-        <span class="panel-field-value" id="panelLocation"></span>
-      </div>
-      <div class="panel-field">
-        <span class="panel-field-label">Owner (Sales Rep)</span>
-        <span class="panel-field-value" id="panelOwner"></span>
-      </div>
+      <div class="panel-field"><span class="panel-field-label">Category</span><span class="panel-field-value" id="panelCategory"></span></div>
+      <div class="panel-field"><span class="panel-field-label">Partner</span><span class="panel-field-value" id="panelPartner"></span></div>
+      <div class="panel-field"><span class="panel-field-label">Serial Number</span><span class="panel-field-value" id="panelSerial"></span></div>
+      <div class="panel-field"><span class="panel-field-label">VAN ID</span><span class="panel-field-value" id="panelVanId"></span></div>
+      <div class="panel-field"><span class="panel-field-label">Home Location</span><span class="panel-field-value" id="panelLocation"></span></div>
+      <div class="panel-field"><span class="panel-field-label">Owner (Sales Rep)</span><span class="panel-field-value" id="panelOwner"></span></div>
     </div>
-
-    <!-- Loan Info (only when on loan) -->
-    <div class="panel-section" id="panelLoanInfoSection" style="display:none;">
+    <div class="panel-section" id="panelLoanSection" style="display:none">
       <div class="panel-section-title">Current Loan</div>
-      <div class="panel-field">
-        <span class="panel-field-label">Customer / Company</span>
-        <span class="panel-field-value" id="panelCustomer"></span>
-      </div>
-      <div class="panel-field">
-        <span class="panel-field-label">Currently With</span>
-        <span class="panel-field-value" id="panelCurrentlyWith"></span>
-      </div>
-      <div class="panel-field">
-        <span class="panel-field-label">Signed Out By</span>
-        <span class="panel-field-value" id="panelSignedOut"></span>
-      </div>
+      <div class="panel-field"><span class="panel-field-label">Customer / Company</span><span class="panel-field-value" id="panelCustomer"></span></div>
+      <div class="panel-field"><span class="panel-field-label">Currently With</span><span class="panel-field-value" id="panelCurrentlyWith"></span></div>
+      <div class="panel-field"><span class="panel-field-label">Signed Out By</span><span class="panel-field-value" id="panelSignedOut"></span></div>
     </div>
-
-    <!-- Loan Dates (only when on loan) -->
-    <div class="panel-section" id="panelDatesSection" style="display:none;">
+    <div class="panel-section" id="panelDatesSection" style="display:none">
       <div class="panel-section-title">Loan Period</div>
-      <div class="panel-field">
-        <span class="panel-field-label">Start Date</span>
-        <span class="panel-field-value" id="panelLoanStart"></span>
-      </div>
-      <div class="panel-field">
-        <span class="panel-field-label">End Date</span>
-        <input type="date" class="panel-date" id="panelLoanEnd" style="width:auto;text-align:right;">
-      </div>
-      <div class="panel-field" id="panelDaysRow">
-        <span class="panel-field-label">Days Remaining</span>
-        <span class="panel-field-value" id="panelDaysLeft"></span>
-      </div>
+      <div class="panel-field"><span class="panel-field-label">Start Date</span><span class="panel-field-value" id="panelLoanStart"></span></div>
+      <div class="panel-field"><span class="panel-field-label">End Date</span><input type="date" class="panel-date" id="panelLoanEnd" style="width:auto;text-align:right"></div>
+      <div class="panel-field"><span class="panel-field-label">Days Remaining</span><span class="panel-field-value" id="panelDaysLeft"></span></div>
     </div>
-
-    <!-- Salesperson Attribution (only when on loan) -->
-    <div class="panel-section" id="panelSalespersonSection" style="display:none;">
+    <div class="panel-section" id="panelSpSection" style="display:none">
       <div class="panel-section-title">Assign / Change Salesperson</div>
-      <select class="panel-select" id="panelSalesperson">
-        <option value="">— Select Salesperson —</option>
-      </select>
+      <select class="panel-select" id="panelSalesperson"><option value="">— Select —</option></select>
     </div>
-
-    <!-- Accessories (always visible if present) -->
-    <div class="panel-section" id="panelAccessoriesSection" style="display:none;">
+    <div class="panel-section" id="panelAccSection" style="display:none">
       <div class="panel-section-title">Included Accessories</div>
-      <div id="panelAccessories" style="font-size:13px;color:var(--text-secondary);line-height:1.7;"></div>
+      <div id="panelAccessories" style="font-size:13px;color:var(--text-secondary);line-height:1.7"></div>
     </div>
-
-    <!-- Comments (always visible if present) -->
-    <div class="panel-section" id="panelCommentsSection" style="display:none;">
+    <div class="panel-section" id="panelComSection" style="display:none">
       <div class="panel-section-title">Comments</div>
-      <div id="panelComments" style="font-size:13px;color:var(--text-secondary);font-style:italic;">—</div>
+      <div id="panelComments" style="font-size:13px;color:var(--text-secondary);font-style:italic"></div>
     </div>
-
-    <!-- Actions (only when on loan) -->
-    <div class="panel-section" id="panelActionsSection" style="display:none;">
+    <div class="panel-section" id="panelActions" style="display:none">
       <div class="panel-actions">
         <button class="btn btn-primary" onclick="saveChanges()">Save Changes</button>
         <button class="btn btn-success" onclick="markReturned()">Mark Returned</button>
@@ -824,479 +217,208 @@ body {
   </div>
 </div>
 
-<!-- TOAST CONTAINER -->
 <div class="toast-container" id="toastContainer"></div>
 
 <script>
-// ============================================================
-// CONFIGURATION — UPDATE THESE
-// ============================================================
+const GH_REPO='VicomANZ/vicom-hub';
+const GH_TOKEN=localStorage.getItem('vicom_gh_token')||'';
+const DATA_PATH='data/equipment.json';
+const SALESPEOPLE=['Angus Wu','Matthew Chantler','Pia Yanes','Filip','Hayden Schippers','Andrew Norrie'];
+const FIELDS=['Kit ID','Model','Partner','Serial Number','VAN ID','Category','Location','Status','Owner (Sales Rep)','Signed Out By','Currently With','Customer Loaned To','Loan Start','Loan End','Accessories','Comments'];
 
-// 1. Published Google Sheet CSV URL (Equipment Register tab)
-const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS_TlBXj2kDHIxm6PcbnBKFR4_n1vVtd-_J_-qm4ZUWECAM4DeiHI1FJGWKaJydFYGBSUvI7c6fnmoi/pub?gid=12044300&single=true&output=csv';
+let equipmentData=[];
+let activeItem=null;
+let fileSha=null;
 
-// 2. Google Apps Script Web App URL (for write-back operations)
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxmmke6TU-lpAi1Ryncm6K9faTTlcWTp-d-Sb4rK72D-lt4MQJAE9kiHToUhJeCu14/exec';
-
-// 3. Salespeople list
-const SALESPEOPLE = [
-  'Angus Wu',
-  'Matthew Chantler',
-  'Pia Yanes',
-  'Filip',
-  'Hayden Schippers',
-  'Andrew Norrie',
-];
-
-// ============================================================
-// STATE
-// ============================================================
-let equipmentData = [];
-let activeItem = null;
-
-// ============================================================
-// DATA LOADING
-// ============================================================
-function parseCSV(csv) {
-  const lines = csv.replace(/\r/g, '').trim().split('\n');
-  const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
-  return lines.slice(1).filter(line => line.trim()).map(line => {
-    const values = [];
-    let current = '';
-    let inQuotes = false;
-    for (let i = 0; i < line.length; i++) {
-      if (line[i] === '"') { inQuotes = !inQuotes; }
-      else if (line[i] === ',' && !inQuotes) { values.push(current.trim()); current = ''; }
-      else { current += line[i]; }
-    }
-    values.push(current.trim());
-    const obj = {};
-    headers.forEach((h, i) => { obj[h] = values[i] || ''; });
-    return obj;
-  });
+// GitHub API
+async function ghFetch(path,opts={}){
+  const r=await fetch(`https://api.github.com/repos/${GH_REPO}/contents/${path}`,{...opts,headers:{'Authorization':`Bearer ${GH_TOKEN}`,'Content-Type':'application/json',...(opts.headers||{})}});
+  return r.json();
 }
-
-function getStatus(item) {
-  if (!item['Status'] || item['Status'] === 'Available') return 'Available';
-  if (item['Loan End']) {
-    const end = new Date(item['Loan End']);
-    const today = new Date();
-    today.setHours(0,0,0,0);
-    if (end < today) return 'Overdue';
-  }
-  return 'On Loan';
-}
-
-function getDaysLeft(endDate) {
-  if (!endDate) return null;
-  const end = new Date(endDate);
-  const today = new Date();
-  today.setHours(0,0,0,0);
-  end.setHours(0,0,0,0);
-  return Math.ceil((end - today) / (1000 * 60 * 60 * 24));
-}
-
-async function loadData() {
-  const btn = document.getElementById('btnRefresh');
-  btn.classList.add('loading');
-
-  try {
-    if (SHEET_CSV_URL) {
-      const res = await fetch(SHEET_CSV_URL + '&t=' + Date.now()); // cache-bust
-      const csv = await res.text();
-      equipmentData = parseCSV(csv);
-      console.log('Loaded', equipmentData.length, 'items from Sheet');
-      console.log('First item:', JSON.stringify(equipmentData[0]));
-      document.getElementById('configBanner').style.display = 'none';
-    } else {
-      document.getElementById('configBanner').style.display = 'flex';
-    }
-
-    // Enrich with computed status + normalise locations
-    const locationMap = {
-      'SYD': 'Vicom Syd', 'MEL': 'Vicom Melb', 'NZ': 'Vicom NZ',
-      'Sydney Office': 'Vicom Syd', 'Melbourne': 'Vicom Melb',
-      'AKL': 'Vicom NZ', 'QLD': 'Vicom Syd',
-    };
-    equipmentData.forEach(item => {
-      item._status = getStatus(item);
-      item._daysLeft = getDaysLeft(item['Loan End']);
-      if (locationMap[item['Location']]) item['Location'] = locationMap[item['Location']];
+async function loadData(){
+  document.getElementById('btnRefresh').classList.add('loading');
+  try{
+    const d=await ghFetch(DATA_PATH);
+    fileSha=d.sha;
+    const json=JSON.parse(atob(d.content));
+    equipmentData=(json.equipment||[]).map(item=>{
+      item._status=getStatus(item);
+      item._daysLeft=getDaysLeft(item['Loan End']);
+      return item;
     });
-
-    updateStats();
-    populateFilters();
-    renderGrid();
-    updateSyncTime();
-  } catch (err) {
-    console.error('Failed to load data:', err);
-    showToast('Failed to load data. Check Sheet URL.', 'error');
-  }
-
-  btn.classList.remove('loading');
+    updateStats();populateFilters();renderGrid();renderTable();
+    document.getElementById('lastSync').textContent='Synced '+new Date().toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'});
+    console.log('Loaded',equipmentData.length,'items');
+  }catch(e){console.error(e);showToast('Failed to load','error');}
+  document.getElementById('btnRefresh').classList.remove('loading');
+}
+async function saveToGitHub(msg){
+  const bar=document.getElementById('savingBar');bar.classList.add('active');
+  try{
+    const payload={lastUpdated:new Date().toISOString(),equipment:equipmentData.map(i=>{const c={};FIELDS.forEach(f=>c[f]=i[f]||'');return c;})};
+    const content=btoa(unescape(encodeURIComponent(JSON.stringify(payload,null,2))));
+    const r=await ghFetch(DATA_PATH,{method:'PUT',body:JSON.stringify({message:msg,content,sha:fileSha})});
+    if(r.content){fileSha=r.content.sha;showToast('Saved successfully');}
+    else{console.error(r);showToast('Save may have failed','error');}
+  }catch(e){console.error(e);showToast('Save failed','error');}
+  bar.classList.remove('active');
 }
 
-function updateSyncTime() {
-  const now = new Date();
-  document.getElementById('lastSync').textContent = 
-    'Synced ' + now.toLocaleTimeString('en-AU', { hour: '2-digit', minute: '2-digit' });
+// Helpers
+function getStatus(i){if(!i.Status||i.Status==='Available')return'Available';if(i['Loan End']){const e=new Date(i['Loan End']),t=new Date();t.setHours(0,0,0,0);if(e<t)return'Overdue';}return'On Loan';}
+function getDaysLeft(d){if(!d)return null;const e=new Date(d),t=new Date();t.setHours(0,0,0,0);e.setHours(0,0,0,0);return Math.ceil((e-t)/(864e5));}
+function fmtDate(d){if(!d)return'—';const dt=new Date(d);return isNaN(dt)?'—':dt.toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'});}
+
+// Stats & Filters
+function updateStats(){
+  const t=equipmentData.length,a=equipmentData.filter(i=>i._status==='Available').length,l=equipmentData.filter(i=>i._status==='On Loan').length,o=equipmentData.filter(i=>i._status==='Overdue').length;
+  document.getElementById('statTotal').textContent=t;document.getElementById('statAvailable').textContent=a;document.getElementById('statOnLoan').textContent=l;document.getElementById('statOverdue').textContent=o;
 }
-
-// ============================================================
-// STATS
-// ============================================================
-function updateStats() {
-  const total = equipmentData.length;
-  const available = equipmentData.filter(i => i._status === 'Available').length;
-  const onLoan = equipmentData.filter(i => i._status === 'On Loan').length;
-  const overdue = equipmentData.filter(i => i._status === 'Overdue').length;
-
-  document.getElementById('statTotal').textContent = total;
-  document.getElementById('statAvailable').textContent = available;
-  document.getElementById('statOnLoan').textContent = onLoan;
-  document.getElementById('statOverdue').textContent = overdue;
+function populateFilters(){
+  const mk=(id,arr,lbl)=>{const el=document.getElementById(id);el.innerHTML=`<option value="">All ${lbl}</option>`+arr.map(v=>`<option>${v}</option>`).join('');};
+  mk('filterCategory',[...new Set(equipmentData.map(i=>i.Category).filter(Boolean))].sort(),'Categories');
+  mk('filterPartner',[...new Set(equipmentData.map(i=>i.Partner).filter(Boolean))].sort(),'Partners');
+  mk('filterLocation',[...new Set(equipmentData.map(i=>i.Location).filter(Boolean))].sort(),'Locations');
+  document.getElementById('addOwner').innerHTML='<option value="">Select...</option>'+SALESPEOPLE.map(s=>`<option>${s}</option>`).join('');
 }
-
-// ============================================================
-// FILTERS
-// ============================================================
-function populateFilters() {
-  const categories = [...new Set(equipmentData.map(i => i['Category']).filter(Boolean))].sort();
-  const catSelect = document.getElementById('filterCategory');
-  catSelect.innerHTML = '<option value="">All Categories</option>';
-  categories.forEach(c => {
-    catSelect.innerHTML += `<option value="${c}">${c}</option>`;
-  });
-
-  const spSelect = document.getElementById('filterSalesperson');
-  spSelect.innerHTML = '<option value="">All Salespeople</option>';
-  SALESPEOPLE.forEach(s => {
-    spSelect.innerHTML += `<option value="${s}">${s}</option>`;
-  });
-
-  const locations = [...new Set(equipmentData.map(i => i['Location']).filter(Boolean))].sort();
-  const locSelect = document.getElementById('filterLocation');
-  locSelect.innerHTML = '<option value="">All Locations</option>';
-  locations.forEach(l => {
-    locSelect.innerHTML += `<option value="${l}">${l}</option>`;
+function getFiltered(){
+  const s=document.getElementById('filterSearch').value.toLowerCase(),st=document.getElementById('filterStatus').value,cat=document.getElementById('filterCategory').value,par=document.getElementById('filterPartner').value,loc=document.getElementById('filterLocation').value;
+  return equipmentData.filter(i=>{
+    if(s&&!(i.Model||'').toLowerCase().includes(s)&&!(i['Kit ID']||'').toLowerCase().includes(s)&&!(i.Category||'').toLowerCase().includes(s)&&!(i['Customer Loaned To']||'').toLowerCase().includes(s)&&!(i.Partner||'').toLowerCase().includes(s))return false;
+    if(st&&i._status!==st)return false;if(cat&&i.Category!==cat)return false;if(par&&i.Partner!==par)return false;if(loc&&i.Location!==loc)return false;return true;
   });
 }
 
-function getFilteredData() {
-  const search = document.getElementById('filterSearch').value.toLowerCase();
-  const status = document.getElementById('filterStatus').value;
-  const category = document.getElementById('filterCategory').value;
-  const salesperson = document.getElementById('filterSalesperson').value;
-  const location = document.getElementById('filterLocation').value;
-
-  return equipmentData.filter(item => {
-    if (search && !item['Model'].toLowerCase().includes(search) && 
-        !item['Kit ID'].toLowerCase().includes(search) &&
-        !item['Category']?.toLowerCase().includes(search) &&
-        !item['Customer Loaned To']?.toLowerCase().includes(search) &&
-        !item['Currently With']?.toLowerCase().includes(search)) return false;
-    if (status && item._status !== status) return false;
-    if (category && item['Category'] !== category) return false;
-    if (salesperson && item['Owner (Sales Rep)'] !== salesperson) return false;
-    if (location && item['Location'] !== location) return false;
-    return true;
-  });
-}
-
-// ============================================================
-// GRID RENDER
-// ============================================================
-function renderGrid() {
-  const filtered = getFilteredData();
-  const container = document.getElementById('gridContainer');
-
-  if (filtered.length === 0) {
-    container.innerHTML = `
-      <div class="empty-state">
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="M8 7h8M8 11h5"/></svg>
-        <h3>No equipment found</h3>
-        <p>Try adjusting your filters</p>
-      </div>`;
-    return;
-  }
-
-  // Sort: overdue first, then on loan, then available
-  const order = { 'Overdue': 0, 'On Loan': 1, 'Available': 2 };
-  filtered.sort((a, b) => order[a._status] - order[b._status]);
-
-  container.innerHTML = `<div class="equipment-grid">${filtered.map(item => {
-    const statusClass = item._status === 'Available' ? 'available' : 
-                        item._status === 'Overdue' ? 'overdue' : 'on-loan';
-    const statusLabel = item._status;
-    const daysText = item._status !== 'Available' && item._daysLeft !== null
-      ? (item._daysLeft < 0 
-          ? `<strong style="color:var(--orange)">${Math.abs(item._daysLeft)}d overdue</strong>` 
-          : item._daysLeft === 0 
-            ? '<strong style="color:var(--orange)">Due today</strong>'
-            : `${item._daysLeft}d remaining`)
-      : '';
-
-    return `
-      <div class="equip-card ${statusClass}" data-kit-id="${item['Kit ID']}">
-        <div class="equip-card-header">
-          <div>
-            <div class="equip-name">${item['Model']}</div>
-            <div class="equip-id">${item['Kit ID']}${item['Serial Number'] ? ' · SN: ' + item['Serial Number'] : ''}</div>
-          </div>
-          <div class="status-badge ${statusClass}">
-            <span class="dot"></span>
-            ${statusLabel}
-          </div>
-        </div>
-        <div class="equip-category">${item['Category'] || '—'}${item['Location'] ? ' · ' + item['Location'] : ''}</div>
-        <div class="equip-meta">
-          ${item._status !== 'Available' ? `
-            <span><strong>${item['Customer Loaned To'] || item['Currently With'] || '—'}</strong></span>
-            <span>${daysText}</span>
-            ${item['Owner (Sales Rep)'] && item['Owner (Sales Rep)'] !== '-' ? `<span>Rep: ${item['Owner (Sales Rep)']}</span>` : '<span style="color:var(--orange)">⚠ No rep assigned</span>'}
-          ` : `<span>Ready for demo${item['Owner (Sales Rep)'] && item['Owner (Sales Rep)'] !== '-' ? ' · ' + item['Owner (Sales Rep)'] : ''}</span>`}
-        </div>
-      </div>`;
+// Card Grid
+function renderGrid(){
+  const f=getFiltered(),c=document.getElementById('gridContainer');
+  if(!f.length){c.innerHTML='<div class="empty-state"><h3>No equipment found</h3><p>Try adjusting your filters</p></div>';return;}
+  const ord={'Overdue':0,'On Loan':1,'Available':2};f.sort((a,b)=>ord[a._status]-ord[b._status]);
+  c.innerHTML=`<div class="equipment-grid">${f.map(i=>{
+    const sc=i._status==='Available'?'available':i._status==='Overdue'?'overdue':'on-loan';
+    const days=i._status!=='Available'&&i._daysLeft!==null?(i._daysLeft<0?`<strong style="color:var(--orange)">${Math.abs(i._daysLeft)}d overdue</strong>`:i._daysLeft===0?'<strong style="color:var(--orange)">Due today</strong>':`${i._daysLeft}d remaining`):'';
+    return`<div class="equip-card ${sc}" data-kid="${i['Kit ID']}"><div class="equip-card-header"><div><div class="equip-name">${i.Model}</div><div class="equip-id">${i['Kit ID']}${i['Serial Number']?' · SN: '+i['Serial Number']:''}</div></div><div class="status-badge ${sc}"><span class="dot"></span>${i._status}</div></div><div class="equip-category">${i.Partner?i.Partner+' · ':''}${i.Category||'—'}${i.Location?' · '+i.Location:''}</div><div class="equip-meta">${i._status!=='Available'?`<span><strong>${i['Customer Loaned To']||i['Currently With']||'—'}</strong></span><span>${days}</span>${i['Owner (Sales Rep)']?`<span>Rep: ${i['Owner (Sales Rep)']}</span>`:'<span style="color:var(--orange)">⚠ No rep</span>'}`:`<span>Ready for demo${i['Owner (Sales Rep)']?' · '+i['Owner (Sales Rep)']:''}</span>`}</div></div>`;
   }).join('')}</div>`;
-
-  // Attach click handlers via event delegation
-  container.querySelectorAll('.equip-card').forEach(card => {
-    card.addEventListener('click', () => {
-      const kitId = card.getAttribute('data-kit-id');
-      if (kitId) openPanel(kitId);
-    });
-  });
+  c.querySelectorAll('.equip-card').forEach(el=>el.addEventListener('click',()=>openPanel(el.dataset.kid)));
 }
 
-// ============================================================
-// DETAIL PANEL
-// ============================================================
-function openPanel(equipId) {
-  activeItem = equipmentData.find(i => i['Kit ID'] === equipId);
-  if (!activeItem) return;
+// Spreadsheet Table
+function renderTable(){
+  const cols=['Kit ID','Model','Partner','Serial Number','Category','Location','Status','Owner (Sales Rep)','Currently With','Customer Loaned To','Loan Start','Loan End'];
+  const thead=document.querySelector('#dataTable thead tr');
+  const tbody=document.querySelector('#dataTable tbody');
+  thead.innerHTML=cols.map(c=>`<th>${c}</th>`).join('');
+  const ord={'Overdue':0,'On Loan':1,'Available':2};
+  const sorted=[...equipmentData].sort((a,b)=>ord[getStatus(a)]-ord[getStatus(b)]);
+  tbody.innerHTML=sorted.map(i=>{
+    const st=getStatus(i),sc=st==='Available'?'available':st==='Overdue'?'overdue':'on-loan',rc=st!=='Available'?sc:'';
+    return`<tr class="${rc}" style="cursor:pointer" data-kid="${i['Kit ID']}">${cols.map(c=>c==='Status'?`<td><span class="cell-status ${sc}">${st}</span></td>`:`<td title="${i[c]||''}">${i[c]||''}</td>`).join('')}</tr>`;
+  }).join('');
+  tbody.querySelectorAll('tr').forEach(r=>r.addEventListener('click',()=>openPanel(r.dataset.kid)));
+}
 
-  const isLoaned = activeItem._status !== 'Available';
+// Detail Panel
+function openPanel(kid){
+  activeItem=equipmentData.find(i=>i['Kit ID']===kid);if(!activeItem)return;
+  const loan=activeItem._status!=='Available';
+  document.getElementById('panelName').textContent=activeItem.Model;
+  document.getElementById('panelId').textContent=activeItem['Kit ID'];
+  const sc=activeItem._status==='Available'?'available':activeItem._status==='Overdue'?'overdue':'on-loan';
+  document.getElementById('panelStatusBadge').innerHTML=`<div class="status-badge ${sc}"><span class="dot"></span>${activeItem._status}</div>`;
+  document.getElementById('panelCategory').textContent=activeItem.Category||'—';
+  document.getElementById('panelPartner').textContent=activeItem.Partner||'—';
+  document.getElementById('panelSerial').textContent=activeItem['Serial Number']||'—';
+  document.getElementById('panelVanId').textContent=activeItem['VAN ID']||'—';
+  document.getElementById('panelLocation').textContent=activeItem.Location||'—';
+  document.getElementById('panelOwner').textContent=activeItem['Owner (Sales Rep)']||'—';
 
-  // ── Header ──
-  document.getElementById('panelName').textContent = activeItem['Model'];
-  document.getElementById('panelId').textContent = activeItem['Kit ID'];
-
-  // ── Status badge ──
-  const statusClass = activeItem._status === 'Available' ? 'available' : 
-                      activeItem._status === 'Overdue' ? 'overdue' : 'on-loan';
-  document.getElementById('panelStatusBadge').innerHTML = 
-    `<div class="status-badge ${statusClass}"><span class="dot"></span>${activeItem._status}</div>`;
-
-  // ── Equipment details (always visible) ──
-  document.getElementById('panelCategory').textContent = activeItem['Category'] || '—';
-  document.getElementById('panelSerial').textContent = activeItem['Serial Number'] || '—';
-  document.getElementById('panelVanId').textContent = activeItem['VAN ID'] || '—';
-  document.getElementById('panelLocation').textContent = activeItem['Location'] || '—';
-  document.getElementById('panelOwner').textContent = activeItem['Owner (Sales Rep)'] || '—';
-
-  // ── Loan info (only when on loan) ──
-  document.getElementById('panelLoanInfoSection').style.display = isLoaned ? 'block' : 'none';
-  if (isLoaned) {
-    const customer = activeItem['Customer Loaned To'] || '';
-    const currentlyWith = activeItem['Currently With'] || '';
-    const signedOut = activeItem['Signed Out By'] || '';
-    document.getElementById('panelCustomer').textContent = (customer && customer !== '-') ? customer : '—';
-    document.getElementById('panelCurrentlyWith').textContent = (currentlyWith && currentlyWith !== '-') ? currentlyWith : '—';
-    document.getElementById('panelSignedOut').textContent = (signedOut && signedOut !== '-') ? signedOut : '—';
+  document.getElementById('panelLoanSection').style.display=loan?'block':'none';
+  if(loan){
+    document.getElementById('panelCustomer').textContent=activeItem['Customer Loaned To']||'—';
+    document.getElementById('panelCurrentlyWith').textContent=activeItem['Currently With']||'—';
+    document.getElementById('panelSignedOut').textContent=activeItem['Signed Out By']||'—';
   }
-
-  // ── Loan dates (only when on loan) ──
-  document.getElementById('panelDatesSection').style.display = isLoaned ? 'block' : 'none';
-  if (isLoaned) {
-    document.getElementById('panelLoanStart').textContent = formatDate(activeItem['Loan Start']);
-    document.getElementById('panelLoanEnd').value = activeItem['Loan End'] || '';
-    
-    const daysEl = document.getElementById('panelDaysLeft');
-    if (activeItem._daysLeft !== null) {
-      if (activeItem._daysLeft < 0) {
-        daysEl.textContent = `${Math.abs(activeItem._daysLeft)} days overdue`;
-        daysEl.className = 'panel-field-value overdue';
-      } else if (activeItem._daysLeft === 0) {
-        daysEl.textContent = 'Due today';
-        daysEl.className = 'panel-field-value overdue';
-      } else {
-        daysEl.textContent = `${activeItem._daysLeft} days`;
-        daysEl.className = 'panel-field-value';
-      }
-    } else {
-      daysEl.textContent = 'No end date set';
-      daysEl.className = 'panel-field-value';
-    }
+  document.getElementById('panelDatesSection').style.display=loan?'block':'none';
+  if(loan){
+    document.getElementById('panelLoanStart').textContent=fmtDate(activeItem['Loan Start']);
+    document.getElementById('panelLoanEnd').value=activeItem['Loan End']||'';
+    const el=document.getElementById('panelDaysLeft');
+    if(activeItem._daysLeft!==null){
+      if(activeItem._daysLeft<0){el.textContent=Math.abs(activeItem._daysLeft)+' days overdue';el.className='panel-field-value overdue';}
+      else if(activeItem._daysLeft===0){el.textContent='Due today';el.className='panel-field-value overdue';}
+      else{el.textContent=activeItem._daysLeft+' days';el.className='panel-field-value';}
+    }else{el.textContent='No end date set';el.className='panel-field-value';}
   }
-
-  // ── Salesperson dropdown (only when on loan) ──
-  document.getElementById('panelSalespersonSection').style.display = isLoaned ? 'block' : 'none';
-  if (isLoaned) {
-    const spSelect = document.getElementById('panelSalesperson');
-    spSelect.innerHTML = '<option value="">— Select Salesperson —</option>';
-    SALESPEOPLE.forEach(s => {
-      const ownerVal = activeItem['Owner (Sales Rep)'] || '';
-      const ownerMatch = ownerVal === s || ownerVal === s.split(' ')[0];
-      spSelect.innerHTML += `<option value="${s}" ${ownerMatch ? 'selected' : ''}>${s}</option>`;
-    });
+  document.getElementById('panelSpSection').style.display=loan?'block':'none';
+  if(loan){
+    const sp=document.getElementById('panelSalesperson');
+    sp.innerHTML='<option value="">— Select —</option>';
+    SALESPEOPLE.forEach(s=>{const ov=activeItem['Owner (Sales Rep)']||'';sp.innerHTML+=`<option value="${s}" ${ov===s||ov===s.split(' ')[0]?'selected':''}>${s}</option>`;});
   }
-
-  // ── Accessories (always visible if present) ──
-  const accessories = activeItem['Accessories'] || '';
-  const accSection = document.getElementById('panelAccessoriesSection');
-  if (accessories && accessories.trim()) {
-    accSection.style.display = 'block';
-    const accList = accessories.split(';').map(a => a.trim()).filter(Boolean);
-    document.getElementById('panelAccessories').innerHTML = accList.map(a => 
-      `<div style="padding:3px 0;border-bottom:1px solid var(--border-light);">• ${a}</div>`
-    ).join('');
-  } else {
-    accSection.style.display = 'none';
-  }
-
-  // ── Comments (always visible if present) ──
-  const comments = activeItem['Comments'] || '';
-  const commSection = document.getElementById('panelCommentsSection');
-  if (comments && comments.trim() && comments !== '-') {
-    commSection.style.display = 'block';
-    document.getElementById('panelComments').textContent = comments;
-  } else {
-    commSection.style.display = 'none';
-  }
-
-  // ── Actions (only when on loan) ──
-  document.getElementById('panelActionsSection').style.display = isLoaned ? 'block' : 'none';
-
-  // ── Open panel ──
+  const acc=activeItem.Accessories||'';
+  const accEl=document.getElementById('panelAccSection');
+  if(acc.trim()){accEl.style.display='block';document.getElementById('panelAccessories').innerHTML=acc.split(';').map(a=>a.trim()).filter(Boolean).map(a=>`<div style="padding:3px 0;border-bottom:1px solid var(--border-light)">• ${a}</div>`).join('');}
+  else accEl.style.display='none';
+  const com=activeItem.Comments||'';
+  const comEl=document.getElementById('panelComSection');
+  if(com.trim()){comEl.style.display='block';document.getElementById('panelComments').textContent=com;}
+  else comEl.style.display='none';
+  document.getElementById('panelActions').style.display=loan?'block':'none';
   document.getElementById('overlay').classList.add('open');
   document.getElementById('detailPanel').classList.add('open');
 }
+function closePanel(){document.getElementById('overlay').classList.remove('open');document.getElementById('detailPanel').classList.remove('open');activeItem=null;}
 
-function closePanel() {
-  document.getElementById('overlay').classList.remove('open');
-  document.getElementById('detailPanel').classList.remove('open');
-  activeItem = null;
+// Actions
+async function saveChanges(){
+  if(!activeItem)return;
+  activeItem['Owner (Sales Rep)']=document.getElementById('panelSalesperson').value;
+  activeItem['Loan End']=document.getElementById('panelLoanEnd').value;
+  activeItem._status=getStatus(activeItem);activeItem._daysLeft=getDaysLeft(activeItem['Loan End']);
+  await saveToGitHub(`update: ${activeItem['Kit ID']}`);
+  updateStats();renderGrid();renderTable();closePanel();
+}
+async function markReturned(){
+  if(!activeItem||!confirm(`Mark "${activeItem.Model}" (${activeItem['Kit ID']}) as returned?`))return;
+  activeItem.Status='Available';activeItem['Currently With']=activeItem['Owner (Sales Rep)'];
+  activeItem['Customer Loaned To']='';activeItem['Loan Start']='';activeItem['Loan End']='';activeItem['Signed Out By']='';
+  activeItem._status='Available';activeItem._daysLeft=null;
+  await saveToGitHub(`return: ${activeItem['Kit ID']}`);
+  updateStats();renderGrid();renderTable();closePanel();
+}
+async function addEquipment(){
+  const v=id=>document.getElementById(id).value.trim();
+  const kid=v('addKitId'),model=v('addModel'),partner=v('addPartner'),cat=v('addCategory'),loc=v('addLocation'),owner=v('addOwner');
+  if(!kid||!model||!partner||!cat||!loc||!owner){showToast('Fill all required fields (*)','error');return;}
+  if(equipmentData.find(i=>i['Kit ID']===kid)){showToast('Kit ID already exists','error');return;}
+  const n={};FIELDS.forEach(f=>n[f]='');
+  Object.assign(n,{'Kit ID':kid,Model:model,Partner:partner,'Serial Number':v('addSerial'),'VAN ID':v('addVanId'),Category:cat,Location:loc,Status:'Available','Owner (Sales Rep)':owner,'Currently With':owner,Accessories:v('addAccessories'),Comments:v('addComments')});
+  n._status='Available';n._daysLeft=null;
+  equipmentData.push(n);
+  await saveToGitHub(`add: ${kid} — ${model} (${partner})`);
+  clearAddForm();populateFilters();updateStats();renderGrid();renderTable();
+}
+function clearAddForm(){['addKitId','addModel','addSerial','addVanId','addAccessories','addComments'].forEach(id=>document.getElementById(id).value='');['addPartner','addCategory','addLocation','addOwner'].forEach(id=>document.getElementById(id).selectedIndex=0);}
+
+// Tabs
+document.querySelectorAll('.tab-btn').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('.tab-btn').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');document.getElementById('tab-'+b.dataset.tab).classList.add('active');
+}));
+
+// Toast
+function showToast(msg,type='success'){
+  const c=document.getElementById('toastContainer'),ic=type==='success'?'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>':'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>';
+  const t=document.createElement('div');t.className='toast';t.innerHTML=ic+msg;c.appendChild(t);
+  setTimeout(()=>{t.style.opacity='0';t.style.transform='translateY(10px)';t.style.transition='all .3s';setTimeout(()=>t.remove(),300);},3000);
 }
 
-function formatDate(dateStr) {
-  if (!dateStr) return '—';
-  const d = new Date(dateStr);
-  return d.toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' });
-}
-
-// ============================================================
-// ACTIONS (write-back via Apps Script)
-// ============================================================
-
-// Helper: POST to Apps Script (uses no-cors + text/plain to avoid CORS preflight)
-async function postToSheet(payload) {
-  if (!APPS_SCRIPT_URL) return false;
-  try {
-    await fetch(APPS_SCRIPT_URL, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'text/plain' },
-      body: JSON.stringify(payload)
-    });
-    return true;
-  } catch (err) {
-    console.error('Sheet write-back failed:', err);
-    return false;
-  }
-}
-
-async function saveChanges() {
-  if (!activeItem) return;
-
-  const newSalesperson = document.getElementById('panelSalesperson').value;
-  const newEndDate = document.getElementById('panelLoanEnd').value;
-
-  // Update local state
-  activeItem['Owner (Sales Rep)'] = newSalesperson;
-  activeItem['Loan End'] = newEndDate;
-  activeItem._status = getStatus(activeItem);
-  activeItem._daysLeft = getDaysLeft(newEndDate);
-
-  const ok = await postToSheet({
-    action: 'update',
-    kitId: activeItem['Kit ID'],
-    fields: {
-      'Owner (Sales Rep)': newSalesperson,
-      'Loan End': newEndDate,
-    }
-  });
-  showToast(ok ? 'Changes saved to Sheet' : 'Changes saved locally');
-
-  updateStats();
-  renderGrid();
-  closePanel();
-}
-
-async function markReturned() {
-  if (!activeItem) return;
-  if (!confirm(`Mark "${activeItem['Model']}" (${activeItem['Kit ID']}) as returned?`)) return;
-
-  // Update local state
-  activeItem['Status'] = 'Available';
-  activeItem['Currently With'] = activeItem['Owner (Sales Rep)'];
-  activeItem['Customer Loaned To'] = '';
-  activeItem['Loan Start'] = '';
-  activeItem['Loan End'] = '';
-  activeItem['Signed Out By'] = '';
-  activeItem._status = 'Available';
-  activeItem._daysLeft = null;
-
-  const ok = await postToSheet({
-    action: 'return',
-    kitId: activeItem['Kit ID'],
-  });
-  showToast(ok ? 'Equipment marked as returned' : 'Returned locally — check Sheet');
-
-  updateStats();
-  renderGrid();
-  closePanel();
-}
-
-// ============================================================
-// TOAST
-// ============================================================
-function showToast(msg, type = 'success') {
-  const container = document.getElementById('toastContainer');
-  const icon = type === 'success' 
-    ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>'
-    : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>';
-  
-  const toast = document.createElement('div');
-  toast.className = 'toast';
-  toast.innerHTML = icon + msg;
-  container.appendChild(toast);
-  
-  setTimeout(() => {
-    toast.style.opacity = '0';
-    toast.style.transform = 'translateY(10px)';
-    toast.style.transition = 'all 0.3s';
-    setTimeout(() => toast.remove(), 300);
-  }, 3000);
-}
-
-// ============================================================
-// TABS
-// ============================================================
-document.querySelectorAll('.tab-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    if (btn.dataset.tab === 'placeholder1') return;
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-  });
-});
-
-// ============================================================
-// INIT
-// ============================================================
+// Token setup
+if(!GH_TOKEN){const t=prompt("Enter GitHub PAT to enable read/write:");if(t){localStorage.setItem("vicom_gh_token",t);location.reload();}}
+// Init
 loadData();
-
-// Auto-refresh every 5 minutes
-setInterval(loadData, 5 * 60 * 1000);
+setInterval(loadData,5*60*1000);
 </script>
 </body>
 </html>
