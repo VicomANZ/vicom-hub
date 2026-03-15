@@ -735,7 +735,7 @@ body {
       <div id="panelStatusBadge" style="display:inline-block;"></div>
     </div>
 
-    <!-- Equipment Info -->
+    <!-- Equipment Info (always visible) -->
     <div class="panel-section">
       <div class="panel-section-title">Equipment Details</div>
       <div class="panel-field">
@@ -746,26 +746,34 @@ body {
         <span class="panel-field-label">Serial Number</span>
         <span class="panel-field-value" id="panelSerial"></span>
       </div>
+      <div class="panel-field">
+        <span class="panel-field-label">VAN ID</span>
+        <span class="panel-field-value" id="panelVanId"></span>
+      </div>
+      <div class="panel-field">
+        <span class="panel-field-label">Home Location</span>
+        <span class="panel-field-value" id="panelLocation"></span>
+      </div>
+      <div class="panel-field">
+        <span class="panel-field-label">Owner (Sales Rep)</span>
+        <span class="panel-field-value" id="panelOwner"></span>
+      </div>
     </div>
 
     <!-- Loan Info (only when on loan) -->
-    <div class="panel-section" id="panelBorrowerSection" style="display:none;">
-      <div class="panel-section-title">Loan Information</div>
-      <div class="panel-field">
-        <span class="panel-field-label">Currently With</span>
-        <span class="panel-field-value" id="panelBorrower"></span>
-      </div>
+    <div class="panel-section" id="panelLoanInfoSection" style="display:none;">
+      <div class="panel-section-title">Current Loan</div>
       <div class="panel-field">
         <span class="panel-field-label">Customer / Company</span>
-        <span class="panel-field-value" id="panelCompany"></span>
+        <span class="panel-field-value" id="panelCustomer"></span>
       </div>
       <div class="panel-field">
-        <span class="panel-field-label">Location</span>
-        <span class="panel-field-value" id="panelEmail"></span>
+        <span class="panel-field-label">Currently With</span>
+        <span class="panel-field-value" id="panelCurrentlyWith"></span>
       </div>
       <div class="panel-field">
         <span class="panel-field-label">Signed Out By</span>
-        <span class="panel-field-value" id="panelPhone"></span>
+        <span class="panel-field-value" id="panelSignedOut"></span>
       </div>
     </div>
 
@@ -786,21 +794,27 @@ body {
       </div>
     </div>
 
-    <!-- Salesperson Attribution -->
+    <!-- Salesperson Attribution (only when on loan) -->
     <div class="panel-section" id="panelSalespersonSection" style="display:none;">
-      <div class="panel-section-title">Assigned Salesperson</div>
+      <div class="panel-section-title">Assign / Change Salesperson</div>
       <select class="panel-select" id="panelSalesperson">
         <option value="">— Select Salesperson —</option>
       </select>
     </div>
 
-    <!-- Notes -->
-    <div class="panel-section">
-      <div class="panel-section-title">Accessories & Notes</div>
-      <div id="panelNotes" style="font-size:13px;color:var(--text-secondary);font-style:italic;">—</div>
+    <!-- Accessories (always visible if present) -->
+    <div class="panel-section" id="panelAccessoriesSection" style="display:none;">
+      <div class="panel-section-title">Included Accessories</div>
+      <div id="panelAccessories" style="font-size:13px;color:var(--text-secondary);line-height:1.7;"></div>
     </div>
 
-    <!-- Actions -->
+    <!-- Comments (always visible if present) -->
+    <div class="panel-section" id="panelCommentsSection" style="display:none;">
+      <div class="panel-section-title">Comments</div>
+      <div id="panelComments" style="font-size:13px;color:var(--text-secondary);font-style:italic;">—</div>
+    </div>
+
+    <!-- Actions (only when on loan) -->
     <div class="panel-section" id="panelActionsSection" style="display:none;">
       <div class="panel-actions">
         <button class="btn btn-primary" onclick="saveChanges()">Save Changes</button>
@@ -1053,35 +1067,42 @@ function openPanel(equipId) {
 
   const isLoaned = activeItem._status !== 'Available';
 
+  // ── Header ──
   document.getElementById('panelName').textContent = activeItem['Model'];
-  document.getElementById('panelId').textContent = activeItem['Kit ID'] + (activeItem['Serial Number'] ? ' · SN: ' + activeItem['Serial Number'] : '');
-  document.getElementById('panelCategory').textContent = activeItem['Category'] || '—';
-  document.getElementById('panelSerial').textContent = activeItem['Serial Number'] || '—';
+  document.getElementById('panelId').textContent = activeItem['Kit ID'];
 
-  // Status badge
+  // ── Status badge ──
   const statusClass = activeItem._status === 'Available' ? 'available' : 
                       activeItem._status === 'Overdue' ? 'overdue' : 'on-loan';
   document.getElementById('panelStatusBadge').innerHTML = 
     `<div class="status-badge ${statusClass}"><span class="dot"></span>${activeItem._status}</div>`;
 
-  // Borrower section — repurposed for loan info
-  document.getElementById('panelBorrowerSection').style.display = isLoaned ? 'block' : 'none';
+  // ── Equipment details (always visible) ──
+  document.getElementById('panelCategory').textContent = activeItem['Category'] || '—';
+  document.getElementById('panelSerial').textContent = activeItem['Serial Number'] || '—';
+  document.getElementById('panelVanId').textContent = activeItem['VAN ID'] || '—';
+  document.getElementById('panelLocation').textContent = activeItem['Location'] || '—';
+  document.getElementById('panelOwner').textContent = activeItem['Owner (Sales Rep)'] || '—';
+
+  // ── Loan info (only when on loan) ──
+  document.getElementById('panelLoanInfoSection').style.display = isLoaned ? 'block' : 'none';
   if (isLoaned) {
-    document.getElementById('panelBorrower').textContent = activeItem['Currently With'] || '—';
-    document.getElementById('panelCompany').textContent = activeItem['Customer Loaned To'] || '—';
-    document.getElementById('panelEmail').textContent = activeItem['Location'] || '—';
-    document.getElementById('panelPhone').textContent = activeItem['Signed Out By'] || '—';
-    document.getElementById('panelPurpose').textContent = '—';
+    const customer = activeItem['Customer Loaned To'] || '';
+    const currentlyWith = activeItem['Currently With'] || '';
+    const signedOut = activeItem['Signed Out By'] || '';
+    document.getElementById('panelCustomer').textContent = (customer && customer !== '-') ? customer : '—';
+    document.getElementById('panelCurrentlyWith').textContent = (currentlyWith && currentlyWith !== '-') ? currentlyWith : '—';
+    document.getElementById('panelSignedOut').textContent = (signedOut && signedOut !== '-') ? signedOut : '—';
   }
 
-  // Dates section
+  // ── Loan dates (only when on loan) ──
   document.getElementById('panelDatesSection').style.display = isLoaned ? 'block' : 'none';
   if (isLoaned) {
     document.getElementById('panelLoanStart').textContent = formatDate(activeItem['Loan Start']);
     document.getElementById('panelLoanEnd').value = activeItem['Loan End'] || '';
     
+    const daysEl = document.getElementById('panelDaysLeft');
     if (activeItem._daysLeft !== null) {
-      const daysEl = document.getElementById('panelDaysLeft');
       if (activeItem._daysLeft < 0) {
         daysEl.textContent = `${Math.abs(activeItem._daysLeft)} days overdue`;
         daysEl.className = 'panel-field-value overdue';
@@ -1092,30 +1113,51 @@ function openPanel(equipId) {
         daysEl.textContent = `${activeItem._daysLeft} days`;
         daysEl.className = 'panel-field-value';
       }
+    } else {
+      daysEl.textContent = 'No end date set';
+      daysEl.className = 'panel-field-value';
     }
   }
 
-  // Salesperson dropdown
+  // ── Salesperson dropdown (only when on loan) ──
   document.getElementById('panelSalespersonSection').style.display = isLoaned ? 'block' : 'none';
-  const spSelect = document.getElementById('panelSalesperson');
-  spSelect.innerHTML = '<option value="">— Select Salesperson —</option>';
-  SALESPEOPLE.forEach(s => {
-    const ownerMatch = activeItem['Owner (Sales Rep)'] === s || activeItem['Owner (Sales Rep)'] === s.split(' ')[0];
-    spSelect.innerHTML += `<option value="${s}" ${ownerMatch ? 'selected' : ''}>${s}</option>`;
-  });
+  if (isLoaned) {
+    const spSelect = document.getElementById('panelSalesperson');
+    spSelect.innerHTML = '<option value="">— Select Salesperson —</option>';
+    SALESPEOPLE.forEach(s => {
+      const ownerVal = activeItem['Owner (Sales Rep)'] || '';
+      const ownerMatch = ownerVal === s || ownerVal === s.split(' ')[0];
+      spSelect.innerHTML += `<option value="${s}" ${ownerMatch ? 'selected' : ''}>${s}</option>`;
+    });
+  }
 
-  // Notes — show accessories + comments
+  // ── Accessories (always visible if present) ──
   const accessories = activeItem['Accessories'] || '';
-  const comments = activeItem['Comments'] || '';
-  let notesText = '';
-  if (accessories) notesText += accessories;
-  if (comments) notesText += (notesText ? '\n\n' : '') + comments;
-  document.getElementById('panelNotes').textContent = notesText || '—';
+  const accSection = document.getElementById('panelAccessoriesSection');
+  if (accessories && accessories.trim()) {
+    accSection.style.display = 'block';
+    const accList = accessories.split(';').map(a => a.trim()).filter(Boolean);
+    document.getElementById('panelAccessories').innerHTML = accList.map(a => 
+      `<div style="padding:3px 0;border-bottom:1px solid var(--border-light);">• ${a}</div>`
+    ).join('');
+  } else {
+    accSection.style.display = 'none';
+  }
 
-  // Actions
+  // ── Comments (always visible if present) ──
+  const comments = activeItem['Comments'] || '';
+  const commSection = document.getElementById('panelCommentsSection');
+  if (comments && comments.trim() && comments !== '-') {
+    commSection.style.display = 'block';
+    document.getElementById('panelComments').textContent = comments;
+  } else {
+    commSection.style.display = 'none';
+  }
+
+  // ── Actions (only when on loan) ──
   document.getElementById('panelActionsSection').style.display = isLoaned ? 'block' : 'none';
 
-  // Open
+  // ── Open panel ──
   document.getElementById('overlay').classList.add('open');
   document.getElementById('detailPanel').classList.add('open');
 }
