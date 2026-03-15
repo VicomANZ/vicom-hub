@@ -404,8 +404,8 @@ async function addEquipment(){
   Object.assign(n,{'Kit ID':kid,Model:model,Partner:partner,'Serial Number':v('addSerial'),'VAN ID':v('addVanId'),Category:cat,Location:loc,Status:'Available','Owner (Sales Rep)':owner,'Currently With':owner,Accessories:v('addAccessories'),Comments:v('addComments')});
   n._status='Available';n._daysLeft=null;
   equipmentData.push(n);
-  await postToSheet({action:'newLoan',kitId:kid,model,customerName:owner,customerCompany:'',salesperson:owner,loanStart:'',loanEnd:'',purpose:'New equipment added via dashboard'});
-  showToast('Equipment added — refresh in a moment to see it in Sheet');
+  await postToSheet({action:'addEquipment',fields:n});
+  showToast('Equipment added to Sheet');
   clearAddForm();populateFilters();updateStats();renderGrid();renderTable();
 }
 function clearAddForm(){['addKitId','addModel','addSerial','addVanId','addAccessories','addComments'].forEach(id=>document.getElementById(id).value='');['addPartner','addCategory','addLocation','addOwner'].forEach(id=>document.getElementById(id).selectedIndex=0);}
