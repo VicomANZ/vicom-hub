@@ -698,6 +698,9 @@ body {
     <select id="filterSalesperson" onchange="renderGrid()">
       <option value="">All Salespeople</option>
     </select>
+    <select id="filterLocation" onchange="renderGrid()">
+      <option value="">All Locations</option>
+    </select>
   </div>
 
   <!-- Equipment Grid -->
@@ -745,28 +748,24 @@ body {
       </div>
     </div>
 
-    <!-- Borrower Info (only when on loan) -->
+    <!-- Loan Info (only when on loan) -->
     <div class="panel-section" id="panelBorrowerSection" style="display:none;">
-      <div class="panel-section-title">Borrower Information</div>
+      <div class="panel-section-title">Loan Information</div>
       <div class="panel-field">
-        <span class="panel-field-label">Name</span>
+        <span class="panel-field-label">Currently With</span>
         <span class="panel-field-value" id="panelBorrower"></span>
       </div>
       <div class="panel-field">
-        <span class="panel-field-label">Company</span>
+        <span class="panel-field-label">Customer / Company</span>
         <span class="panel-field-value" id="panelCompany"></span>
       </div>
       <div class="panel-field">
-        <span class="panel-field-label">Email</span>
+        <span class="panel-field-label">Location</span>
         <span class="panel-field-value" id="panelEmail"></span>
       </div>
       <div class="panel-field">
-        <span class="panel-field-label">Phone</span>
+        <span class="panel-field-label">Signed Out By</span>
         <span class="panel-field-value" id="panelPhone"></span>
-      </div>
-      <div class="panel-field">
-        <span class="panel-field-label">Purpose</span>
-        <span class="panel-field-value" id="panelPurpose"></span>
       </div>
     </div>
 
@@ -797,7 +796,7 @@ body {
 
     <!-- Notes -->
     <div class="panel-section">
-      <div class="panel-section-title">Notes</div>
+      <div class="panel-section-title">Accessories & Notes</div>
       <div id="panelNotes" style="font-size:13px;color:var(--text-secondary);font-style:italic;">—</div>
     </div>
 
@@ -819,20 +818,20 @@ body {
 // CONFIGURATION — UPDATE THESE
 // ============================================================
 
-// 1. Your published Google Sheet CSV URL
-//    (File → Share → Publish to web → select sheet tab → CSV → Publish)
-const SHEET_CSV_URL = '';
+// 1. Published Google Sheet CSV URL (Equipment Register tab)
+const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS_TlBXj2kDHIxm6PcbnBKFR4_n1vVtd-_J_-qm4ZUWECAM4DeiHI1FJGWKaJydFYGBSUvI7c6fnmoi/pub?gid=12044300&single=true&output=csv';
 
 // 2. Google Apps Script Web App URL (for write-back operations)
-//    Deploy an Apps Script that accepts POST requests to update the sheet
 const APPS_SCRIPT_URL = '';
 
 // 3. Salespeople list
 const SALESPEOPLE = [
-  'Matt Jones',
-  'John Smith',
-  'Sarah Wilson',
-  // Add your salespeople here
+  'Angus Wu',
+  'Matthew Chantler',
+  'Pia Yanes',
+  'Filip',
+  'Hayden Schippers',
+  'Andrew Norrie',
 ];
 
 // ============================================================
@@ -840,20 +839,6 @@ const SALESPEOPLE = [
 // ============================================================
 let equipmentData = [];
 let activeItem = null;
-
-// ============================================================
-// DEMO DATA (used when no Sheet is connected)
-// ============================================================
-const DEMO_DATA = [
-  { 'Equipment ID': 'VIC-OSC-001', 'Name': 'Tektronix MDO3054 Mixed Domain Oscilloscope', 'Category': 'Oscilloscopes', 'Serial Number': 'C012345', 'Status': 'Available', 'Borrower Name': '', 'Borrower Company': '', 'Borrower Email': '', 'Borrower Phone': '', 'Loan Start': '', 'Loan End': '', 'Salesperson': '', 'Purpose': '', 'Notes': '4-channel, 500MHz bandwidth' },
-  { 'Equipment ID': 'VIC-OSC-002', 'Name': 'Keysight DSOX3024T Oscilloscope', 'Category': 'Oscilloscopes', 'Serial Number': 'MY5678', 'Status': 'On Loan', 'Borrower Name': 'David Chen', 'Borrower Company': 'Telstra Network Engineering', 'Borrower Email': 'dchen@telstra.com.au', 'Borrower Phone': '0412 345 678', 'Loan Start': '2026-03-01', 'Loan End': '2026-03-20', 'Salesperson': 'Matt Jones', 'Purpose': 'Site acceptance testing - 5G rollout', 'Notes': '' },
-  { 'Equipment ID': 'VIC-RAD-001', 'Name': 'Rohde & Schwarz CMW500 Radio Test Set', 'Category': 'Radio Test Sets', 'Serial Number': 'RS9012', 'Status': 'On Loan', 'Borrower Name': 'Lisa Park', 'Borrower Company': 'Optus Labs', 'Borrower Email': 'lpark@optus.com.au', 'Borrower Phone': '0423 456 789', 'Loan Start': '2026-02-15', 'Loan End': '2026-03-10', 'Salesperson': '', 'Purpose': 'LTE band testing evaluation', 'Notes': 'Includes calibration cert' },
-  { 'Equipment ID': 'VIC-FIB-001', 'Name': 'EXFO FTBx-735C OTDR', 'Category': 'Optical Fibre', 'Serial Number': 'EX3456', 'Status': 'Available', 'Borrower Name': '', 'Borrower Company': '', 'Borrower Email': '', 'Borrower Phone': '', 'Loan Start': '', 'Loan End': '', 'Salesperson': '', 'Purpose': '', 'Notes': 'Single-mode, 1310/1550nm' },
-  { 'Equipment ID': 'VIC-PWR-001', 'Name': 'Keithley 2450 SourceMeter SMU', 'Category': 'SMUs', 'Serial Number': 'KE7890', 'Status': 'Available', 'Borrower Name': '', 'Borrower Company': '', 'Borrower Email': '', 'Borrower Phone': '', 'Loan Start': '', 'Loan End': '', 'Salesperson': '', 'Purpose': '', 'Notes': '200V, 1A, 20W' },
-  { 'Equipment ID': 'VIC-PWR-002', 'Name': 'Rigol DP832A DC Power Supply', 'Category': 'DC Power Supplies', 'Serial Number': 'DP1234', 'Status': 'On Loan', 'Borrower Name': 'James Wright', 'Borrower Company': 'BAE Systems Australia', 'Borrower Email': 'j.wright@baesystems.com', 'Borrower Phone': '0434 567 890', 'Loan Start': '2026-03-10', 'Loan End': '2026-04-10', 'Salesperson': 'John Smith', 'Purpose': 'Power supply evaluation for defence project', 'Notes': '3 channels, 30V/3A each' },
-  { 'Equipment ID': 'VIC-GPS-001', 'Name': 'Spirent GSS7000 GNSS Simulator', 'Category': 'GNSS/GPS Simulators', 'Serial Number': 'SP5678', 'Status': 'Available', 'Borrower Name': '', 'Borrower Company': '', 'Borrower Email': '', 'Borrower Phone': '', 'Loan Start': '', 'Loan End': '', 'Salesperson': '', 'Purpose': '', 'Notes': 'Multi-constellation: GPS, GLONASS, Galileo, BeiDou' },
-  { 'Equipment ID': 'VIC-ANT-001', 'Name': 'Bird 5000-XT Digital Power Meter', 'Category': 'RF Power', 'Serial Number': 'BD9012', 'Status': 'On Loan', 'Borrower Name': 'Mark Stevens', 'Borrower Company': 'NBN Co', 'Borrower Email': 'mstevens@nbnco.com.au', 'Borrower Phone': '0445 678 901', 'Loan Start': '2026-02-20', 'Loan End': '2026-03-14', 'Salesperson': 'Sarah Wilson', 'Purpose': 'RF power measurement - regional tower upgrade', 'Notes': 'With 250W element' },
-];
 
 // ============================================================
 // DATA LOADING
@@ -903,13 +888,11 @@ async function loadData() {
 
   try {
     if (SHEET_CSV_URL) {
-      const res = await fetch(SHEET_CSV_URL);
+      const res = await fetch(SHEET_CSV_URL + '&t=' + Date.now()); // cache-bust
       const csv = await res.text();
       equipmentData = parseCSV(csv);
       document.getElementById('configBanner').style.display = 'none';
     } else {
-      // Use demo data
-      equipmentData = JSON.parse(JSON.stringify(DEMO_DATA));
       document.getElementById('configBanner').style.display = 'flex';
     }
 
@@ -968,6 +951,13 @@ function populateFilters() {
   SALESPEOPLE.forEach(s => {
     spSelect.innerHTML += `<option value="${s}">${s}</option>`;
   });
+
+  const locations = [...new Set(equipmentData.map(i => i['Location']).filter(Boolean))].sort();
+  const locSelect = document.getElementById('filterLocation');
+  locSelect.innerHTML = '<option value="">All Locations</option>';
+  locations.forEach(l => {
+    locSelect.innerHTML += `<option value="${l}">${l}</option>`;
+  });
 }
 
 function getFilteredData() {
@@ -975,14 +965,18 @@ function getFilteredData() {
   const status = document.getElementById('filterStatus').value;
   const category = document.getElementById('filterCategory').value;
   const salesperson = document.getElementById('filterSalesperson').value;
+  const location = document.getElementById('filterLocation').value;
 
   return equipmentData.filter(item => {
-    if (search && !item['Name'].toLowerCase().includes(search) && 
-        !item['Equipment ID'].toLowerCase().includes(search) &&
-        !item['Borrower Company']?.toLowerCase().includes(search)) return false;
+    if (search && !item['Model'].toLowerCase().includes(search) && 
+        !item['Kit ID'].toLowerCase().includes(search) &&
+        !item['Category']?.toLowerCase().includes(search) &&
+        !item['Customer Loaned To']?.toLowerCase().includes(search) &&
+        !item['Currently With']?.toLowerCase().includes(search)) return false;
     if (status && item._status !== status) return false;
     if (category && item['Category'] !== category) return false;
-    if (salesperson && item['Salesperson'] !== salesperson) return false;
+    if (salesperson && item['Owner (Sales Rep)'] !== salesperson) return false;
+    if (location && item['Location'] !== location) return false;
     return true;
   });
 }
@@ -1021,24 +1015,24 @@ function renderGrid() {
       : '';
 
     return `
-      <div class="equip-card ${statusClass}" onclick="openPanel('${item['Equipment ID']}')">
+      <div class="equip-card ${statusClass}" onclick="openPanel('${item['Kit ID']}')">
         <div class="equip-card-header">
           <div>
-            <div class="equip-name">${item['Name']}</div>
-            <div class="equip-id">${item['Equipment ID']}</div>
+            <div class="equip-name">${item['Model']}</div>
+            <div class="equip-id">${item['Kit ID']}${item['Serial Number'] ? ' · SN: ' + item['Serial Number'] : ''}</div>
           </div>
           <div class="status-badge ${statusClass}">
             <span class="dot"></span>
             ${statusLabel}
           </div>
         </div>
-        <div class="equip-category">${item['Category'] || '—'}</div>
+        <div class="equip-category">${item['Category'] || '—'}${item['Location'] ? ' · ' + item['Location'] : ''}</div>
         <div class="equip-meta">
           ${item._status !== 'Available' ? `
-            <span><strong>${item['Borrower Company'] || item['Borrower Name'] || '—'}</strong></span>
+            <span><strong>${item['Customer Loaned To'] || item['Currently With'] || '—'}</strong></span>
             <span>${daysText}</span>
-            ${item['Salesperson'] ? `<span>Rep: ${item['Salesperson']}</span>` : '<span style="color:var(--orange)">⚠ No rep assigned</span>'}
-          ` : `<span>Ready for demo</span>`}
+            ${item['Owner (Sales Rep)'] && item['Owner (Sales Rep)'] !== '-' ? `<span>Rep: ${item['Owner (Sales Rep)']}</span>` : '<span style="color:var(--orange)">⚠ No rep assigned</span>'}
+          ` : `<span>Ready for demo${item['Owner (Sales Rep)'] && item['Owner (Sales Rep)'] !== '-' ? ' · ' + item['Owner (Sales Rep)'] : ''}</span>`}
         </div>
       </div>`;
   }).join('')}</div>`;
@@ -1048,13 +1042,13 @@ function renderGrid() {
 // DETAIL PANEL
 // ============================================================
 function openPanel(equipId) {
-  activeItem = equipmentData.find(i => i['Equipment ID'] === equipId);
+  activeItem = equipmentData.find(i => i['Kit ID'] === equipId);
   if (!activeItem) return;
 
   const isLoaned = activeItem._status !== 'Available';
 
-  document.getElementById('panelName').textContent = activeItem['Name'];
-  document.getElementById('panelId').textContent = activeItem['Equipment ID'];
+  document.getElementById('panelName').textContent = activeItem['Model'];
+  document.getElementById('panelId').textContent = activeItem['Kit ID'] + (activeItem['Serial Number'] ? ' · SN: ' + activeItem['Serial Number'] : '');
   document.getElementById('panelCategory').textContent = activeItem['Category'] || '—';
   document.getElementById('panelSerial').textContent = activeItem['Serial Number'] || '—';
 
@@ -1064,14 +1058,14 @@ function openPanel(equipId) {
   document.getElementById('panelStatusBadge').innerHTML = 
     `<div class="status-badge ${statusClass}"><span class="dot"></span>${activeItem._status}</div>`;
 
-  // Borrower section
+  // Borrower section — repurposed for loan info
   document.getElementById('panelBorrowerSection').style.display = isLoaned ? 'block' : 'none';
   if (isLoaned) {
-    document.getElementById('panelBorrower').textContent = activeItem['Borrower Name'] || '—';
-    document.getElementById('panelCompany').textContent = activeItem['Borrower Company'] || '—';
-    document.getElementById('panelEmail').textContent = activeItem['Borrower Email'] || '—';
-    document.getElementById('panelPhone').textContent = activeItem['Borrower Phone'] || '—';
-    document.getElementById('panelPurpose').textContent = activeItem['Purpose'] || '—';
+    document.getElementById('panelBorrower').textContent = activeItem['Currently With'] || '—';
+    document.getElementById('panelCompany').textContent = activeItem['Customer Loaned To'] || '—';
+    document.getElementById('panelEmail').textContent = activeItem['Location'] || '—';
+    document.getElementById('panelPhone').textContent = activeItem['Signed Out By'] || '—';
+    document.getElementById('panelPurpose').textContent = '—';
   }
 
   // Dates section
@@ -1100,11 +1094,17 @@ function openPanel(equipId) {
   const spSelect = document.getElementById('panelSalesperson');
   spSelect.innerHTML = '<option value="">— Select Salesperson —</option>';
   SALESPEOPLE.forEach(s => {
-    spSelect.innerHTML += `<option value="${s}" ${activeItem['Salesperson'] === s ? 'selected' : ''}>${s}</option>`;
+    const ownerMatch = activeItem['Owner (Sales Rep)'] === s || activeItem['Owner (Sales Rep)'] === s.split(' ')[0];
+    spSelect.innerHTML += `<option value="${s}" ${ownerMatch ? 'selected' : ''}>${s}</option>`;
   });
 
-  // Notes
-  document.getElementById('panelNotes').textContent = activeItem['Notes'] || '—';
+  // Notes — show accessories + comments
+  const accessories = activeItem['Accessories'] || '';
+  const comments = activeItem['Comments'] || '';
+  let notesText = '';
+  if (accessories) notesText += accessories;
+  if (comments) notesText += (notesText ? '\n\n' : '') + comments;
+  document.getElementById('panelNotes').textContent = notesText || '—';
 
   // Actions
   document.getElementById('panelActionsSection').style.display = isLoaned ? 'block' : 'none';
@@ -1136,7 +1136,7 @@ async function saveChanges() {
   const newEndDate = document.getElementById('panelLoanEnd').value;
 
   // Update local state
-  activeItem['Salesperson'] = newSalesperson;
+  activeItem['Owner (Sales Rep)'] = newSalesperson;
   activeItem['Loan End'] = newEndDate;
   activeItem._status = getStatus(activeItem);
   activeItem._daysLeft = getDaysLeft(newEndDate);
@@ -1149,9 +1149,9 @@ async function saveChanges() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           action: 'update',
-          equipmentId: activeItem['Equipment ID'],
+          kitId: activeItem['Kit ID'],
           fields: {
-            'Salesperson': newSalesperson,
+            'Owner (Sales Rep)': newSalesperson,
             'Loan End': newEndDate,
           }
         })
@@ -1171,18 +1171,15 @@ async function saveChanges() {
 
 async function markReturned() {
   if (!activeItem) return;
-  if (!confirm(`Mark "${activeItem['Name']}" as returned?`)) return;
+  if (!confirm(`Mark "${activeItem['Model']}" (${activeItem['Kit ID']}) as returned?`)) return;
 
   // Update local state
   activeItem['Status'] = 'Available';
-  activeItem['Borrower Name'] = '';
-  activeItem['Borrower Company'] = '';
-  activeItem['Borrower Email'] = '';
-  activeItem['Borrower Phone'] = '';
+  activeItem['Currently With'] = activeItem['Owner (Sales Rep)'];
+  activeItem['Customer Loaned To'] = '';
   activeItem['Loan Start'] = '';
   activeItem['Loan End'] = '';
-  activeItem['Salesperson'] = '';
-  activeItem['Purpose'] = '';
+  activeItem['Signed Out By'] = '';
   activeItem._status = 'Available';
   activeItem._daysLeft = null;
 
@@ -1194,7 +1191,7 @@ async function markReturned() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           action: 'return',
-          equipmentId: activeItem['Equipment ID'],
+          kitId: activeItem['Kit ID'],
         })
       });
       showToast('Equipment marked as returned');
