@@ -858,9 +858,9 @@ let activeItem = null;
 // DATA LOADING
 // ============================================================
 function parseCSV(csv) {
-  const lines = csv.trim().split('\n');
+  const lines = csv.replace(/\r/g, '').trim().split('\n');
   const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
-  return lines.slice(1).map(line => {
+  return lines.slice(1).filter(line => line.trim()).map(line => {
     const values = [];
     let current = '';
     let inQuotes = false;
@@ -905,6 +905,8 @@ async function loadData() {
       const res = await fetch(SHEET_CSV_URL + '&t=' + Date.now()); // cache-bust
       const csv = await res.text();
       equipmentData = parseCSV(csv);
+      console.log('Loaded', equipmentData.length, 'items from Sheet');
+      console.log('First item:', JSON.stringify(equipmentData[0]));
       document.getElementById('configBanner').style.display = 'none';
     } else {
       document.getElementById('configBanner').style.display = 'flex';
@@ -1035,7 +1037,7 @@ function renderGrid() {
       : '';
 
     return `
-      <div class="equip-card ${statusClass}" onclick="openPanel('${item['Kit ID']}')">
+      <div class="equip-card ${statusClass}" data-kit-id="${item['Kit ID']}">
         <div class="equip-card-header">
           <div>
             <div class="equip-name">${item['Model']}</div>
@@ -1056,6 +1058,14 @@ function renderGrid() {
         </div>
       </div>`;
   }).join('')}</div>`;
+
+  // Attach click handlers via event delegation
+  container.querySelectorAll('.equip-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const kitId = card.getAttribute('data-kit-id');
+      if (kitId) openPanel(kitId);
+    });
+  });
 }
 
 // ============================================================
