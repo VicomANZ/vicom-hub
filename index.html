@@ -822,7 +822,7 @@ body {
 const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS_TlBXj2kDHIxm6PcbnBKFR4_n1vVtd-_J_-qm4ZUWECAM4DeiHI1FJGWKaJydFYGBSUvI7c6fnmoi/pub?gid=12044300&single=true&output=csv';
 
 // 2. Google Apps Script Web App URL (for write-back operations)
-const APPS_SCRIPT_URL = '';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxmmke6TU-lpAi1Ryncm6K9faTTlcWTp-d-Sb4rK72D-lt4MQJAE9kiHToUhJeCu14/exec';
 
 // 3. Salespeople list
 const SALESPEOPLE = [
@@ -1129,6 +1129,24 @@ function formatDate(dateStr) {
 // ============================================================
 // ACTIONS (write-back via Apps Script)
 // ============================================================
+
+// Helper: POST to Apps Script (uses no-cors + text/plain to avoid CORS preflight)
+async function postToSheet(payload) {
+  if (!APPS_SCRIPT_URL) return false;
+  try {
+    await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify(payload)
+    });
+    return true;
+  } catch (err) {
+    console.error('Sheet write-back failed:', err);
+    return false;
+  }
+}
+
 async function saveChanges() {
   if (!activeItem) return;
 
@@ -1141,28 +1159,15 @@ async function saveChanges() {
   activeItem._status = getStatus(activeItem);
   activeItem._daysLeft = getDaysLeft(newEndDate);
 
-  if (APPS_SCRIPT_URL) {
-    try {
-      await fetch(APPS_SCRIPT_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'update',
-          kitId: activeItem['Kit ID'],
-          fields: {
-            'Owner (Sales Rep)': newSalesperson,
-            'Loan End': newEndDate,
-          }
-        })
-      });
-      showToast('Changes saved');
-    } catch (err) {
-      showToast('Saved locally — Sheet sync may be delayed', 'warn');
+  const ok = await postToSheet({
+    action: 'update',
+    kitId: activeItem['Kit ID'],
+    fields: {
+      'Owner (Sales Rep)': newSalesperson,
+      'Loan End': newEndDate,
     }
-  } else {
-    showToast('Changes saved locally (no Sheet write-back configured)');
-  }
+  });
+  showToast(ok ? 'Changes saved to Sheet' : 'Changes saved locally');
 
   updateStats();
   renderGrid();
@@ -1183,24 +1188,11 @@ async function markReturned() {
   activeItem._status = 'Available';
   activeItem._daysLeft = null;
 
-  if (APPS_SCRIPT_URL) {
-    try {
-      await fetch(APPS_SCRIPT_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'return',
-          kitId: activeItem['Kit ID'],
-        })
-      });
-      showToast('Equipment marked as returned');
-    } catch (err) {
-      showToast('Returned locally — Sheet sync may be delayed', 'warn');
-    }
-  } else {
-    showToast('Marked returned locally (no Sheet write-back configured)');
-  }
+  const ok = await postToSheet({
+    action: 'return',
+    kitId: activeItem['Kit ID'],
+  });
+  showToast(ok ? 'Equipment marked as returned' : 'Returned locally — check Sheet');
 
   updateStats();
   renderGrid();
