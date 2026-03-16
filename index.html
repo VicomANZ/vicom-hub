@@ -143,11 +143,34 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);color:v
   <div class="link-popup-box">
     <h3>Generate Loan Form Link</h3>
     <div class="subtitle" id="linkEquipName"></div>
-    <div class="form-group" style="margin-bottom:0">
+    <div class="form-group" style="margin-bottom:12px">
       <label>Who are you?</label>
       <select class="panel-select" id="linkRepSelect" onchange="generateLink()">
         <option value="">— Select your name —</option>
       </select>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:0">
+      <div class="form-group">
+        <label>Loan Period</label>
+        <select class="panel-select" id="linkLoanPeriod" onchange="updateLoanDates();generateLink()">
+          <option value="">— Select —</option>
+          <option value="1">1 week</option>
+          <option value="2">2 weeks</option>
+          <option value="4">4 weeks</option>
+          <option value="6">6 weeks</option>
+          <option value="8">8 weeks</option>
+          <option value="custom">Custom dates</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Start Date</label>
+        <input type="date" class="panel-date" id="linkStartDate" onchange="updateLoanDates();generateLink()">
+      </div>
+    </div>
+    <div style="margin:12px 0 0;font-size:13px;color:var(--text-secondary);display:none" id="linkDatesPreview"></div>
+    <div class="form-group" id="linkCustomEndGroup" style="display:none;margin-top:12px">
+      <label>Custom End Date</label>
+      <input type="date" class="panel-date" id="linkCustomEnd" onchange="generateLink()">
     </div>
     <div class="link-field" id="linkFieldArea" style="display:none">
       <div class="link-url" id="linkUrl"></div>
@@ -500,18 +523,77 @@ function openLinkPopup(kid){
   const sel=document.getElementById('linkRepSelect');
   sel.innerHTML='<option value="">— Select your name —</option>'+SALESPEOPLE.map(s=>`<option value="${s}">${s}</option>`).join('');
   sel.value='';
+  document.getElementById('linkLoanPeriod').value='';
+  document.getElementById('linkStartDate').value=new Date().toISOString().split('T')[0];
+  document.getElementById('linkCustomEndGroup').style.display='none';
+  document.getElementById('linkDatesPreview').style.display='none';
   document.getElementById('linkFieldArea').style.display='none';
   document.getElementById('btnCopy').textContent='Copy Link';
   document.getElementById('btnCopy').classList.remove('copied');
   document.getElementById('linkPopup').classList.add('open');
 }
 function closeLinkPopup(){document.getElementById('linkPopup').classList.remove('open');linkKitId='';}
+
+function updateLoanDates(){
+  const period=document.getElementById('linkLoanPeriod').value;
+  const startStr=document.getElementById('linkStartDate').value;
+  const preview=document.getElementById('linkDatesPreview');
+  const customGroup=document.getElementById('linkCustomEndGroup');
+
+  if(period==='custom'){
+    customGroup.style.display='block';
+    preview.style.display='none';
+    return;
+  }
+  customGroup.style.display='none';
+
+  if(!period||!startStr){preview.style.display='none';return;}
+
+  const start=new Date(startStr);
+  const weeks=parseInt(period);
+  const end=new Date(start);
+  end.setDate(end.getDate()+weeks*7);
+
+  const fmtShort=d=>d.toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'});
+  preview.innerHTML=`📅 <strong>${fmtShort(start)}</strong> → <strong>${fmtShort(end)}</strong> (${weeks} week${weeks>1?'s':''})`;
+  preview.style.display='block';
+}
+
+function getLoanEndDate(){
+  const period=document.getElementById('linkLoanPeriod').value;
+  if(!period)return'';
+  if(period==='custom')return document.getElementById('linkCustomEnd').value||'';
+  const startStr=document.getElementById('linkStartDate').value;
+  if(!startStr)return'';
+  const start=new Date(startStr);
+  const end=new Date(start);
+  end.setDate(end.getDate()+parseInt(period)*7);
+  return end.toISOString().split('T')[0];
+}
+
 function generateLink(){
   const rep=document.getElementById('linkRepSelect').value;
-  if(!rep){document.getElementById('linkFieldArea').style.display='none';return;}
+  const period=document.getElementById('linkLoanPeriod').value;
+  if(!rep||!period){document.getElementById('linkFieldArea').style.display='none';return;}
+
   const item=equipmentData.find(i=>i['Kit ID']===linkKitId);
   if(!item)return;
-  const params=new URLSearchParams({KitID:item['Kit ID'],Model:item.Model,SerialNumber:item['Serial Number']||'',Partner:item.Partner||'',Location:item.Location||'',Rep:rep});
+
+  const startDate=document.getElementById('linkStartDate').value||'';
+  const endDate=getLoanEndDate();
+  const loanWeeks=period==='custom'?'custom':period;
+
+  const params=new URLSearchParams({
+    KitID:item['Kit ID'],
+    Model:item.Model,
+    SerialNumber:item['Serial Number']||'',
+    Partner:item.Partner||'',
+    Location:item.Location||'',
+    Rep:rep,
+    LoanWeeks:loanWeeks,
+    StartDate:startDate,
+    EndDate:endDate
+  });
   const url=FORM_BASE_URL+'?'+params.toString();
   document.getElementById('linkUrl').textContent=url;
   document.getElementById('linkUrl').title=url;
