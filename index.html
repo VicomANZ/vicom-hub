@@ -97,10 +97,64 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);color:v
 @keyframes slideUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 .empty-state{text-align:center;padding:80px 20px;color:var(--text-muted)}
 .empty-state h3{font-size:16px;font-weight:600;color:var(--text-secondary);margin-bottom:6px}
+/* PIN SCREEN */
+.pin-screen{position:fixed;inset:0;background:linear-gradient(135deg,var(--navy),var(--navy-deeper));z-index:999;display:flex;align-items:center;justify-content:center;flex-direction:column}
+.pin-screen.hidden{display:none}
+.pin-box{background:var(--card-bg);border-radius:var(--radius);padding:40px;text-align:center;box-shadow:var(--shadow-lg);width:340px}
+.pin-box h2{font-size:20px;font-weight:700;color:var(--text);margin-bottom:4px}
+.pin-box p{font-size:13px;color:var(--text-muted);margin-bottom:24px}
+.pin-input{width:160px;text-align:center;font-size:28px;font-family:'JetBrains Mono',monospace;letter-spacing:12px;padding:12px;border:2px solid var(--border);border-radius:var(--radius-sm);outline:none;color:var(--text)}
+.pin-input:focus{border-color:var(--navy)}
+.pin-input.error{border-color:var(--red);animation:shake .4s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.pin-error{color:var(--red);font-size:12px;margin-top:8px;height:16px}
+/* GET LINK POPUP */
+.link-popup{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:250;align-items:center;justify-content:center}
+.link-popup.open{display:flex}
+.link-popup-box{background:var(--card-bg);border-radius:var(--radius);padding:28px;width:440px;max-width:90vw;box-shadow:var(--shadow-lg)}
+.link-popup-box h3{font-size:16px;font-weight:700;margin-bottom:4px}
+.link-popup-box .subtitle{font-size:13px;color:var(--text-muted);margin-bottom:20px}
+.link-popup-box .link-field{display:flex;gap:8px;margin-top:16px}
+.link-popup-box .link-url{flex:1;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:12px;font-family:'JetBrains Mono',monospace;color:var(--text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.btn-copy{background:var(--navy);color:#fff;border:none;padding:10px 18px;border-radius:var(--radius-sm);font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap}
+.btn-copy:hover{background:var(--navy-dark)}
+.btn-copy.copied{background:var(--green)}
+/* GET LINK BUTTON ON CARDS */
+.equip-card .btn-get-link{display:none;margin-top:10px;padding:6px 14px;background:var(--navy);color:#fff;border:none;border-radius:var(--radius-sm);font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;width:100%;text-align:center;transition:all .2s}
+.equip-card .btn-get-link:hover{background:var(--navy-dark)}
+.equip-card.available .btn-get-link{display:block}
 @media(max-width:768px){.header{padding:0 16px}.tabs-bar{padding:0 16px;overflow-x:auto}.main{padding:20px 16px}.stats-bar{flex-direction:column;gap:10px}.equipment-grid{grid-template-columns:1fr}.detail-panel{width:100vw}.add-form-grid{grid-template-columns:1fr 1fr}}
 </style>
 </head>
 <body>
+<!-- PIN SCREEN -->
+<div class="pin-screen" id="pinScreen">
+  <div class="pin-box">
+    <div style="margin-bottom:20px"><div class="header-logo" style="font-size:24px;color:var(--navy)">VICOM <span style="color:var(--gold)">Hub</span></div></div>
+    <h2>Enter PIN</h2>
+    <p>Access restricted to Vicom staff</p>
+    <input type="password" class="pin-input" id="pinInput" maxlength="4" inputmode="numeric" pattern="[0-9]*" autofocus>
+    <div class="pin-error" id="pinError"></div>
+  </div>
+</div>
+
+<!-- GET LINK POPUP -->
+<div class="link-popup" id="linkPopup" onclick="if(event.target===this)closeLinkPopup()">
+  <div class="link-popup-box">
+    <h3>Generate Loan Form Link</h3>
+    <div class="subtitle" id="linkEquipName"></div>
+    <div class="form-group" style="margin-bottom:0">
+      <label>Who are you?</label>
+      <select class="panel-select" id="linkRepSelect" onchange="generateLink()">
+        <option value="">— Select your name —</option>
+      </select>
+    </div>
+    <div class="link-field" id="linkFieldArea" style="display:none">
+      <div class="link-url" id="linkUrl"></div>
+      <button class="btn-copy" id="btnCopy" onclick="copyLink()">Copy Link</button>
+    </div>
+  </div>
+</div>
 <header class="header">
   <div class="header-left">
     <div class="header-logo">VICOM <span>Hub</span></div>
@@ -306,7 +360,7 @@ function renderGrid(){
   c.innerHTML=`<div class="equipment-grid">${f.map(i=>{
     const sc=i._status==='Available'?'available':i._status==='Overdue'?'overdue':'on-loan';
     const days=i._status!=='Available'&&i._daysLeft!==null?(i._daysLeft<0?`<strong style="color:var(--orange)">${Math.abs(i._daysLeft)}d overdue</strong>`:i._daysLeft===0?'<strong style="color:var(--orange)">Due today</strong>':`${i._daysLeft}d remaining`):'';
-    return`<div class="equip-card ${sc}" data-kid="${i['Kit ID']}"><div class="equip-card-header"><div><div class="equip-name">${i.Model}</div><div class="equip-id">${i['Kit ID']}${i['Serial Number']?' · SN: '+i['Serial Number']:''}</div></div><div class="status-badge ${sc}"><span class="dot"></span>${i._status}</div></div><div class="equip-category">${i.Partner?i.Partner+' · ':''}${i.Category||'—'}${i.Location?' · '+i.Location:''}</div><div class="equip-meta">${i._status!=='Available'?`<span><strong>${i['Customer Loaned To']||i['Currently With']||'—'}</strong></span><span>${days}</span>${i['Owner (Sales Rep)']?`<span>Rep: ${i['Owner (Sales Rep)']}</span>`:'<span style="color:var(--orange)">⚠ No rep</span>'}`:`<span>Ready for demo${i['Owner (Sales Rep)']?' · '+i['Owner (Sales Rep)']:''}</span>`}</div></div>`;
+    return`<div class="equip-card ${sc}" data-kid="${i['Kit ID']}"><div class="equip-card-header"><div><div class="equip-name">${i.Model}</div><div class="equip-id">${i['Kit ID']}${i['Serial Number']?' · SN: '+i['Serial Number']:''}</div></div><div class="status-badge ${sc}"><span class="dot"></span>${i._status}</div></div><div class="equip-category">${i.Partner?i.Partner+' · ':''}${i.Category||'—'}${i.Location?' · '+i.Location:''}</div><div class="equip-meta">${i._status!=='Available'?`<span><strong>${i['Customer Loaned To']||i['Currently With']||'—'}</strong></span><span>${days}</span>${i['Owner (Sales Rep)']?`<span>Rep: ${i['Owner (Sales Rep)']}</span>`:'<span style="color:var(--orange)">⚠ No rep</span>'}`:`<span>Ready for demo${i['Owner (Sales Rep)']?' · '+i['Owner (Sales Rep)']:''}</span>`}</div>${i._status==='Available'?`<button class="btn-get-link" data-kid="${i['Kit ID']}" onclick="event.stopPropagation();openLinkPopup('${i['Kit ID']}')">📋 Get Loan Form Link</button>`:''}</div>`;
   }).join('')}</div>`;
   c.querySelectorAll('.equip-card').forEach(el=>el.addEventListener('click',()=>openPanel(el.dataset.kid)));
 }
@@ -410,6 +464,70 @@ async function addEquipment(){
 }
 function clearAddForm(){['addKitId','addModel','addSerial','addVanId','addAccessories','addComments'].forEach(id=>document.getElementById(id).value='');['addPartner','addCategory','addLocation','addOwner'].forEach(id=>document.getElementById(id).selectedIndex=0);}
 
+// PIN Gate
+const PIN='6975';
+function checkPin(){
+  const stored=sessionStorage.getItem('vicom_pin');
+  if(stored===PIN){document.getElementById('pinScreen').classList.add('hidden');return true;}
+  return false;
+}
+document.getElementById('pinInput').addEventListener('input',function(){
+  const v=this.value;
+  document.getElementById('pinError').textContent='';
+  this.classList.remove('error');
+  if(v.length===4){
+    if(v===PIN){
+      sessionStorage.setItem('vicom_pin',v);
+      document.getElementById('pinScreen').classList.add('hidden');
+      loadData();
+    }else{
+      this.classList.add('error');
+      document.getElementById('pinError').textContent='Incorrect PIN';
+      setTimeout(()=>{this.value='';this.classList.remove('error');},600);
+    }
+  }
+});
+
+// Get Link Popup
+let linkKitId='';
+const FORM_BASE_URL='https://www.cognitoforms.com/VicomANZ/DemoLoanRequest'; // UPDATE THIS with your actual Cognito form URL
+
+function openLinkPopup(kid){
+  linkKitId=kid;
+  const item=equipmentData.find(i=>i['Kit ID']===kid);
+  if(!item)return;
+  document.getElementById('linkEquipName').textContent=`${item.Model} — ${item['Kit ID']}${item['Serial Number']?' (SN: '+item['Serial Number']+')':''}`;
+  const sel=document.getElementById('linkRepSelect');
+  sel.innerHTML='<option value="">— Select your name —</option>'+SALESPEOPLE.map(s=>`<option value="${s}">${s}</option>`).join('');
+  sel.value='';
+  document.getElementById('linkFieldArea').style.display='none';
+  document.getElementById('btnCopy').textContent='Copy Link';
+  document.getElementById('btnCopy').classList.remove('copied');
+  document.getElementById('linkPopup').classList.add('open');
+}
+function closeLinkPopup(){document.getElementById('linkPopup').classList.remove('open');linkKitId='';}
+function generateLink(){
+  const rep=document.getElementById('linkRepSelect').value;
+  if(!rep){document.getElementById('linkFieldArea').style.display='none';return;}
+  const item=equipmentData.find(i=>i['Kit ID']===linkKitId);
+  if(!item)return;
+  const params=new URLSearchParams({KitID:item['Kit ID'],Model:item.Model,SerialNumber:item['Serial Number']||'',Partner:item.Partner||'',Location:item.Location||'',Rep:rep});
+  const url=FORM_BASE_URL+'?'+params.toString();
+  document.getElementById('linkUrl').textContent=url;
+  document.getElementById('linkUrl').title=url;
+  document.getElementById('linkFieldArea').style.display='flex';
+  document.getElementById('btnCopy').textContent='Copy Link';
+  document.getElementById('btnCopy').classList.remove('copied');
+}
+function copyLink(){
+  const url=document.getElementById('linkUrl').textContent;
+  navigator.clipboard.writeText(url).then(()=>{
+    document.getElementById('btnCopy').textContent='Copied!';
+    document.getElementById('btnCopy').classList.add('copied');
+    showToast('Link copied to clipboard');
+  });
+}
+
 // Tabs
 document.querySelectorAll('.tab-btn').forEach(b=>b.addEventListener('click',()=>{
   document.querySelectorAll('.tab-btn').forEach(x=>x.classList.remove('active'));
@@ -425,8 +543,8 @@ function showToast(msg,type='success'){
 }
 
 // Init
-loadData();
-setInterval(loadData,5*60*1000);
+if(checkPin())loadData();
+setInterval(()=>{if(checkPin())loadData();},5*60*1000);
 </script>
 </body>
 </html>
